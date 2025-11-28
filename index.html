@@ -25,6 +25,7 @@
         
         .demand-bar {
             width: 8px;
+            height: 40px;
             flex-shrink: 0;
             transition: all 0.3s ease;
             border-radius: 1px;
@@ -262,9 +263,9 @@
             let barClass = color === 'red' ? 'bar-red' : color === 'orange' ? 'bar-orange' : 'bar-green';
             let bars = '';
             
-            // Generate 30 bars with equal height (100%)
+            // Generate 30 bars with equal height
             for (let i = 0; i < 30; i++) {
-                bars += `<div class="demand-bar ${barClass}" style="height: 100%;"></div>`;
+                bars += `<div class="demand-bar ${barClass}"></div>`;
             }
             
             return bars;
