@@ -21,6 +21,8 @@
             gap: 2px;
             height: 40px;
             align-items: flex-end;
+            image-rendering: crisp-edges;
+            image-rendering: pixelated;
         }
         
         .demand-bar {
@@ -28,7 +30,8 @@
             height: 40px;
             flex-shrink: 0;
             transition: all 0.3s ease;
-            border-radius: 1px;
+            border-radius: 0;
+            will-change: transform;
         }
         
         .bar-red { background-color: #ef4444; }
