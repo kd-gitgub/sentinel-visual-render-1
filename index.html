@@ -321,35 +321,32 @@
                             </div>
                         </div>
 
-                        <!-- Metrics Row -->
-                        <div class="flex justify-between items-start">
-                            <!-- Demand-Ability Bars -->
-                            <div class="flex flex-col mt-2" style="flex: 1; max-width: 45%;">
-                                <div class="flex items-center justify-between mb-2">
-                                    <div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Demand-Ability</div>
-                                    <div class="text-sm font-bold ${chartTextClass}">${card.demand.val}%</div>
-                                </div>
-                                <div class="demand-bars">
-                                    ${generateDemandBars(card.demand.val, card.demand.color)}
-                                </div>
+                        <!-- Demand-Ability Bars (Full Width) -->
+                        <div class="flex flex-col mb-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Demand-Ability</div>
+                                <div class="text-sm font-bold ${chartTextClass}">${card.demand.val}%</div>
+                            </div>
+                            <div class="demand-bars">
+                                ${generateDemandBars(card.demand.val, card.demand.color)}
+                            </div>
+                        </div>
+
+                        <!-- Malice/Toxicity/Grounding Stats Row -->
+                        <div class="flex justify-between items-center gap-4">
+                            <div class="flex flex-col items-center flex-1">
+                                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Malice</div>
+                                <div class="text-xl font-bold ${maliceClass} leading-none mt-1">${card.malice}</div>
+                            </div>
+                            
+                            <div class="flex flex-col items-center flex-1">
+                                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Toxicity</div>
+                                <div class="text-xl font-bold ${toxicityClass} leading-none mt-1">${card.toxicity}</div>
                             </div>
 
-                            <!-- Malice/Toxicity/Grounding Stats -->
-                            <div class="flex flex-col items-end space-y-2">
-                                <div>
-                                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider text-right">Malice</div>
-                                    <div class="text-3xl font-bold ${maliceClass} leading-none text-right">${card.malice}</div>
-                                </div>
-                                
-                                <div>
-                                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider text-right">Toxicity</div>
-                                    <div class="text-2xl font-bold ${toxicityClass} leading-none text-right">${card.toxicity}</div>
-                                </div>
-
-                                <div>
-                                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider text-right">Grounding</div>
-                                    <div class="text-xl font-bold ${groundingClass} leading-none text-right">${card.grounding}</div>
-                                </div>
+                            <div class="flex flex-col items-center flex-1">
+                                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Grounding</div>
+                                <div class="text-xl font-bold ${groundingClass} leading-none mt-1">${card.grounding}</div>
                             </div>
                         </div>
                     </div>
