@@ -369,8 +369,9 @@
 
             const privacyClass = card.privacy.type === 'warning' ? 'text-orange-500 font-bold' : 'text-[#66cc00] font-bold';
             
-            const chartTextClass = card.demand.color === 'red' ? 'text-red-500' : 
-                                   card.demand.color === 'orange' ? 'text-orange-400' : 'text-[#84cc16]';
+            // Set % text color to match the most recent (31st) bar color
+            const chartTextClass = recentDayStatus === 'red' ? 'text-red-500' : 
+                                   recentDayStatus === 'orange' ? 'text-orange-400' : 'text-[#84cc16]';
 
             const maliceClass = card.maliceColor === 'red' ? 'text-red-500' : 'text-gray-900';
             const toxicityClass = card.maliceColor === 'red' ? 'text-red-500' : 'text-gray-900';
@@ -417,7 +418,10 @@
                                 <div class="demand-bars">
                                     ${generateDemandBars(card.demand.val, card.id)}
                                 </div>
-                                <div class="text-sm font-bold ${chartTextClass} ml-2 mr-1">${card.demand.val}%</div>
+                                <div class="flex flex-col items-center ml-1.5 mr-1">
+                                    <div class="text-sm font-bold ${chartTextClass} leading-none">${card.demand.val}%</div>
+                                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-0.5">Now</div>
+                                </div>
                             </div>
                         </div>
 
