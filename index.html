@@ -41,9 +41,9 @@
         .bar-gray { background-color: #e5e7eb; }
 
         /* Status Dot Colors */
-        .status-dot-red { background-color: #ef4444; box-shadow: 0 0 0 2px #7f1d1d; }
-        .status-dot-orange { background-color: #eab308; box-shadow: 0 0 0 2px #854d0e; }
-        .status-dot-green { background-color: #84cc16; box-shadow: 0 0 0 2px #365314; }
+        .status-dot-red { background-color: #ef4444; }
+        .status-dot-orange { background-color: #eab308; }
+        .status-dot-green { background-color: #84cc16; }
 
         /* Tooltip Logic */
         .has-tooltip:hover .tooltip-content {
@@ -65,19 +65,22 @@
     <!-- Main Header -->
     <header class="bg-[#0A142D] rounded-none p-6 mb-8 shadow-xl max-w-[1400px] mx-auto">
         <h1 class="text-2xl font-bold mb-4 text-white">Agent Safety & Alignment</h1>
-        <div class="flex flex-wrap gap-6 text-sm font-semibold">
-            <div class="flex items-center">
-                <span class="w-2.5 h-2.5 rounded-full bg-red-500 mr-2"></span>
-                <span class="text-white">ACTIVE THREATS: 3</span>
+        <div class="flex items-center justify-between w-full text-sm font-semibold">
+            <div class="flex items-center gap-6">
+                <div class="flex items-center">
+                    <span class="w-2.5 h-2.5 rounded-full bg-red-500 mr-2"></span>
+                    <span class="text-white">ACTIVE THREATS: 3</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="w-2.5 h-2.5 rounded-full bg-yellow-500 mr-2"></span>
+                    <span class="text-white">HIGH LOAD: 4</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="w-2.5 h-2.5 rounded-full bg-cyan-500 mr-2"></span>
+                    <span class="text-white">PII ALERTS: 4</span>
+                </div>
             </div>
-            <div class="flex items-center">
-                <span class="w-2.5 h-2.5 rounded-full bg-yellow-500 mr-2"></span>
-                <span class="text-white">HIGH LOAD: 4</span>
-            </div>
-            <div class="flex items-center">
-                <span class="w-2.5 h-2.5 rounded-full bg-cyan-500 mr-2"></span>
-                <span class="text-white">PII ALERTS: 4</span>
-            </div>
+            <div id="captive-agents" class="text-white">CAPTIVE AGENTS: 0</div>
         </div>
     </header>
 
@@ -262,6 +265,8 @@
         ];
 
         const grid = document.getElementById('card-grid');
+        const captiveEl = document.getElementById('captive-agents');
+        if (captiveEl) captiveEl.textContent = `CAPTIVE AGENTS: ${cards.length}`;
 
         // Get the most recent day's demand status for an agent
         function getMostRecentDayStatus(agentId) {
