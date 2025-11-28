@@ -363,10 +363,12 @@
         };
 
         cards.forEach(card => {
-            // Determine status dot color based on most recent demand day
+            // Determine status dot color: blink red if malice is red, else fall back to recent demand status
             const recentDayStatus = getMostRecentDayStatus(card.id);
             let statusDotClass;
-            if (recentDayStatus === 'red') {
+            if (card.maliceColor === 'red') {
+                statusDotClass = 'status-dot-red';
+            } else if (recentDayStatus === 'red') {
                 statusDotClass = 'status-dot-red';
             } else if (recentDayStatus === 'orange') {
                 statusDotClass = 'status-dot-orange';
