@@ -312,6 +312,11 @@
                 }
             }
             
+            // Append a 31st bar using the most recent day's status color
+            const recentStatus = getMostRecentDayStatus(agentId);
+            const extraClass = recentStatus === 'red' ? 'bar-red' : (recentStatus === 'orange' ? 'bar-orange' : 'bar-green');
+            bars += `<div class="demand-bar ${extraClass}"></div>`;
+            
             return bars;
         }
 
