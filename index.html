@@ -10,7 +10,7 @@
         
         body {
             font-family: 'Segoe UI', 'Segoe UI Web (West European)', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
-            background: #001C66;
+            background: #ffffff;
             min-height: 100vh;
             padding: 20px;
         }
@@ -78,22 +78,21 @@
 <body>
 
     <!-- Main Header -->
-    <header class="bg-white rounded-2xl p-8 mb-8 shadow-xl max-w-[1400px] mx-auto">
-        <h1 class="text-3xl font-bold mb-3 text-[#001C66]">Safety & Alignment Monitor</h1>
-        <p class="text-[#001C66] mb-6 text-sm">Real-time monitoring dashboard for AI agent safety metrics</p>
-        <div class="flex flex-wrap gap-4 text-xs font-bold tracking-wide">
-            <div class="flex items-center bg-[#f8fafc] rounded-full px-4 py-2 border-l-4 border-red-500">
-                <span class="w-2 h-2 rounded-full bg-red-500 mr-2"></span>
-                <span class="text-[#001C66]">ACTIVE THREATS: 3</span>
+    <header class="bg-[#0A142D] rounded-2xl p-8 mb-8 shadow-xl max-w-[1400px] mx-auto">
+        <h1 class="text-3xl font-bold mb-3 text-white">Safety & Alignment Monitor</h1>
+        <p class="text-white mb-6 text-sm">Real-time monitoring dashboard for AI agent safety metrics</p>
+        <div class="flex flex-wrap gap-6 text-sm font-semibold">
+            <div class="flex items-center">
+                <span class="w-2.5 h-2.5 rounded-full bg-red-500 mr-2"></span>
+                <span class="text-white">ACTIVE THREATS: 3</span>
             </div>
-            <div class="flex items-center bg-[#f8fafc] rounded-full px-4 py-2 border-l-4 border-yellow-500">
-                <span class="w-2 h-2 rounded-full bg-yellow-500 mr-2"></span>
-                <span class="text-[#001C66]">HIGH LOAD: 4</span>
+            <div class="flex items-center">
+                <span class="w-2.5 h-2.5 rounded-full bg-yellow-500 mr-2"></span>
+                <span class="text-white">HIGH LOAD: 4</span>
             </div>
-            <div class="flex items-center bg-[#f8fafc] rounded-full px-4 py-2 border-l-4 border-cyan-500">
-                <!-- Fingerprint Icon SVG -->
-                <svg class="w-3 h-3 mr-2 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.2-2.848.578-4.13m4.896-.757C8.636 6.046 7.842 6 7 6a6 6 0 00-6 6"></path></svg>
-                <span class="text-[#001C66]">PII ALERTS: 4</span>
+            <div class="flex items-center">
+                <span class="w-2.5 h-2.5 rounded-full bg-cyan-500 mr-2"></span>
+                <span class="text-white">PII ALERTS: 4</span>
             </div>
         </div>
     </header>
