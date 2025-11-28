@@ -15,46 +15,24 @@
             padding: 20px;
         }
 
-        /* Custom Donut Chart Classes using Conic Gradients */
-        .donut-ring {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            position: relative;
+        /* Demand-Ability Bar Chart */
+        .demand-bars {
             display: flex;
-            align-items: center;
-            justify-content: center;
+            gap: 2px;
+            height: 40px;
+            align-items: flex-end;
         }
         
-        .donut-ring::after {
-            content: "";
-            position: absolute;
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            background-color: white;
+        .demand-bar {
+            width: 4px;
+            transition: all 0.3s ease;
+            border-radius: 1px;
         }
-
-        .donut-content {
-            position: relative;
-            z-index: 10;
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
-
-        /* Chart Variants */
-        .chart-96 { background: conic-gradient(#ef4444 0% 96%, #e5e7eb 96% 100%); }
-        .chart-94 { background: conic-gradient(#ef4444 0% 94%, #e5e7eb 94% 100%); }
-        .chart-86 { background: conic-gradient(#f97316 0% 86%, #e5e7eb 86% 100%); }
-        .chart-70 { background: conic-gradient(#84cc16 0% 70%, #e5e7eb 70% 100%); }
-        .chart-65 { background: conic-gradient(#84cc16 0% 65%, #e5e7eb 65% 100%); }
-        .chart-60 { background: conic-gradient(#84cc16 0% 60%, #e5e7eb 60% 100%); }
-        .chart-78 { background: conic-gradient(#f97316 0% 78%, #e5e7eb 78% 100%); }
-        .chart-46 { background: conic-gradient(#84cc16 0% 46%, #e5e7eb 46% 100%); }
-        .chart-34 { background: conic-gradient(#84cc16 0% 34%, #e5e7eb 34% 100%); }
-        .chart-33 { background: conic-gradient(#84cc16 0% 33%, #e5e7eb 33% 100%); }
-        .chart-89 { background: conic-gradient(#f97316 0% 89%, #e5e7eb 89% 100%); }
-        .chart-27 { background: conic-gradient(#84cc16 0% 27%, #e5e7eb 27% 100%); }
+        
+        .bar-red { background-color: #ef4444; }
+        .bar-orange { background-color: #f97316; }
+        .bar-green { background-color: #84cc16; }
+        .bar-gray { background-color: #e5e7eb; }
 
         /* Status Dot Colors */
         .status-dot-red { background-color: #ef4444; box-shadow: 0 0 0 2px #7f1d1d; }
@@ -278,6 +256,24 @@
 
         const grid = document.getElementById('card-grid');
 
+        // Generate 20 vertical bars with semi-random heights based on demand value
+        function generateDemandBars(demandVal, color) {
+            let barClass = color === 'red' ? 'bar-red' : color === 'orange' ? 'bar-orange' : 'bar-green';
+            let bars = '';
+            
+            // Generate 20 bars with varying heights that trend around the demand value
+            for (let i = 0; i < 20; i++) {
+                // Create variation: base height with some randomness
+                const variation = (Math.random() - 0.5) * 20; // +/- 10%
+                const barHeight = Math.max(10, Math.min(100, demandVal + variation));
+                const heightPercent = barHeight + '%';
+                
+                bars += `<div class="demand-bar ${barClass}" style="height: ${heightPercent};"></div>`;
+            }
+            
+            return bars;
+        }
+
         cards.forEach(card => {
             // Icon Logic
             const fingerprintPath = "M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.2-2.848.578-4.13m4.896-.757C8.636 6.046 7.842 6 7 6a6 6 0 00-6 6";
@@ -327,11 +323,14 @@
 
                         <!-- Metrics Row -->
                         <div class="flex justify-between items-start">
-                            <!-- Donut Chart -->
-                            <div class="flex flex-col items-center mt-2">
-                                <div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Demand-Ability</div>
-                                <div class="donut-ring chart-${card.demand.val}">
-                                    <div class="donut-content ${chartTextClass}">${card.demand.val}%</div>
+                            <!-- Demand-Ability Bars -->
+                            <div class="flex flex-col mt-2" style="flex: 1; max-width: 45%;">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Demand-Ability</div>
+                                    <div class="text-sm font-bold ${chartTextClass}">${card.demand.val}%</div>
+                                </div>
+                                <div class="demand-bars">
+                                    ${generateDemandBars(card.demand.val, card.demand.color)}
                                 </div>
                             </div>
 
