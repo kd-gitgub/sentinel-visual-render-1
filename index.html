@@ -41,9 +41,25 @@
         .bar-gray { background-color: #e5e7eb; }
 
         /* Status Dot Colors */
-        .status-dot-red { background-color: #ef4444; }
-        .status-dot-orange { background-color: #eab308; }
+        .status-dot-red { 
+            background-color: #ef4444;
+            animation: flash-red 0.6s ease-in-out infinite;
+        }
+        .status-dot-orange { 
+            background-color: #eab308;
+            animation: blink-amber 2s ease-in-out infinite;
+        }
         .status-dot-green { background-color: #84cc16; }
+
+        @keyframes flash-red {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        @keyframes blink-amber {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
 
         /* Tooltip Logic */
         .has-tooltip:hover .tooltip-content {
