@@ -425,9 +425,9 @@
                                 </div>
                         </div>
 
-                        <!-- Demand-Ability Bars (Full Width) -->
+                        <!-- Demand Ability Bars (Full Width) -->
                         <div class="flex flex-col mb-4">
-                            <div class="text-[10px] font-bold text-[#0a1930] uppercase tracking-wider mb-2">Demand-Ability</div>
+                            <div class="text-[10px] font-bold text-[#0a1930] uppercase tracking-wider mb-2">Demand Ability (Cognitive Load)</div>
                             <div class="flex items-center justify-between">
                                 <div class="demand-bars">
                                     ${generateDemandBars(card.demand.val, card.id)}
@@ -439,18 +439,16 @@
                             </div>
                         </div>
 
-                        <!-- Malice/Toxicity/Grounding Stats Row -->
-                        <div class="flex justify-between items-center gap-4">
+                        <!-- Malice/Toxicity/Grounding Stats Row (Equal Spacing) -->
+                        <div class="flex justify-between items-start">
                             <div class="flex flex-col items-center flex-1">
                                 <div class="text-[10px] font-bold text-[#0a1930] uppercase tracking-wider">Malice</div>
                                 <div class="text-xl font-bold ${maliceClass} leading-none mt-1">${card.malice}</div>
                             </div>
-                            
                             <div class="flex flex-col items-center flex-1">
                                 <div class="text-[10px] font-bold text-[#0a1930] uppercase tracking-wider">Toxicity</div>
                                 <div class="text-xl font-bold ${toxicityClass} leading-none mt-1">${card.toxicity}</div>
                             </div>
-
                             <div class="flex flex-col items-center flex-1">
                                 <div class="text-[10px] font-bold text-[#0a1930] uppercase tracking-wider">Grounding</div>
                                 <div class="text-xl font-bold ${groundingClass} leading-none mt-1">${card.grounding}</div>
