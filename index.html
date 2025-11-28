@@ -330,18 +330,7 @@
             'AG-06': Array(30).fill('green'),
             'AG-07': Array(30).fill('green').map((val, idx) => {
                 return idx === 29 ? 'orange' : val;
-            }),Determine status dot color based on most recent demand day
-            const recentDayStatus = getMostRecentDayStatus(card.id);
-            let statusDotClass;
-            if (recentDayStatus === 'red') {
-                statusDotClass = 'status-dot-red';
-            } else if (recentDayStatus === 'orange') {
-                statusDotClass = 'status-dot-orange';
-            } else {
-                statusDotClass = 'status-dot-green';
-            }
-            
-            // statusDotClass
+            }),
             'AG-08': Array(30).fill('green'),
             'AG-09': Array(30).fill('green'),
             'AG-10': Array(30).fill('green').map((val, idx) => {
