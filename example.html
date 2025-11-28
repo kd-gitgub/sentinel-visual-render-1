@@ -1,0 +1,1687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AOM Tooling Governance: Decision Log</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Segoe UI Web (West European)', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Segoe UI Web (West European)', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
+            background: #001C66;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .dashboard-header {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .dashboard-title {
+            font-size: 2em;
+            color: #001C66;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-subtitle {
+            color: #001C66;
+            margin-bottom: 30px;
+        }
+
+        /* Summary Stats */
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .summary-stat {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 7px solid #001C66;
+            /* Prevent small inline pieces from breaking onto a new line (e.g. 'WACC 7.35% =') */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .summary-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #001C66;
+            margin-bottom: 5px;
+        }
+
+        .summary-label {
+            color: #001C66;
+            font-size: 0.9em;
+        }
+
+        /* Filter Controls */
+        .filter-controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            color: #001C66;
+            font-size: 0.9em;
+            margin-right: 5px;
+        }
+
+        .decision-status-filter,
+        .decision-level-filter {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            position: relative;
+        }
+
+        .custom-dropdown {
+            position: relative;
+            min-width: 140px;
+        }
+
+        .dropdown-header {
+            padding: 8px 16px;
+            padding-right: 35px;
+            border: 1px solid #001CAD;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #001CAD;
+            font-size: 0.9em;
+            font-family: inherit;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2' stroke='%23001CAD'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3e%3c/path%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 18px;
+            user-select: none;
+        }
+
+        .dropdown-header:hover {
+            border-color: #001CAD;
+            opacity: 0.9;
+        }
+
+        .dropdown-header:focus {
+            outline: none;
+            border-color: #001CAD;
+            box-shadow: 0 0 0 3px rgba(0, 28, 173, 0.1);
+        }
+
+        .dropdown-content {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #001CAD;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .dropdown-content.open {
+            display: block;
+        }
+
+        .dropdown-option {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 0.9em;
+            color: #001C66;
+        }
+
+        .dropdown-option:hover {
+            background-color: #f1f5f9;
+        }
+
+        .dropdown-option input[type="checkbox"] {
+            margin-right: 8px;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        /* View Toggle */
+        .view-toggle {
+            margin-left: auto;
+            display: flex;
+            background: #e2e8f0;
+            border-radius: 8px;
+            padding: 3px;
+        }
+
+        .view-btn {
+            padding: 6px 16px;
+            border: none;
+            background: transparent;
+            color: #001C66;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.2s;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .view-btn.active {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Decision Cards */
+        .decisions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 24px;
+            padding: 20px 0;
+        }
+
+        .decision-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.2s;
+            cursor: pointer;
+            position: relative;
+            height: 100%;
+        }
+
+        .decision-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-color: #0079FF;
+        }
+
+        .card-top-badges {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .level-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-size: 0.75em;
+            font-weight: 600;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            background: #E5E7EB;
+            color: #0A142D;
+            border-radius: 16px;
+            font-size: 0.75em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-header {
+            margin-bottom: 15px;
+        }
+
+        .card-id {
+            color: #6b7280;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .card-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #001C66;
+            margin-bottom: 5px;
+        }
+
+        .card-category {
+            color: #6b7280;
+            font-size: 0.85em;
+        }
+
+        .progress-section {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .progress-ring {
+            position: relative;
+            display: inline-block;
+        }
+
+        .progress-ring svg {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-circle {
+            stroke-dasharray: 220;
+            transition: stroke-dashoffset 0.3s;
+        }
+
+        .progress-ring-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #001C66;
+        }
+
+        .mini-steps {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .mini-step {
+            width: 28px;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .mini-step.completed {
+            background: #10b981;
+        }
+
+        .mini-step.active {
+            background: #0079FF;
+            animation: pulse 2s infinite;
+        }
+
+        .mini-step-tooltip {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2937;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 10;
+        }
+
+        .mini-step:hover .mini-step-tooltip {
+            opacity: 1;
+        }
+
+        /* Details Modal Styles */
+        .detailed-steps {
+            margin-top: 20px;
+        }
+
+        .detailed-step {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid #e2e8f0;
+            transition: all 0.3s;
+        }
+
+        .detailed-step.completed {
+            border-left-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .detailed-step.active {
+            border-left-color: #0079FF;
+            background: #eff6ff;
+            animation: pulse 2s infinite;
+        }
+
+        .detailed-step-indicator {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 15px;
+            font-size: 0.9em;
+            background: white;
+            color: #6b7280;
+            border: 2px solid #e2e8f0;
+        }
+
+        .detailed-step.completed .detailed-step-indicator {
+            background: #10b981;
+            color: white;
+            border: none;
+        }
+
+        .detailed-step.active .detailed-step-indicator {
+            background: #0079FF;
+            color: white;
+            border: none;
+        }
+
+        .detailed-step-title {
+            font-weight: 600;
+            color: #001C66;
+            font-size: 1em;
+        }
+
+        /* Investment Profile Button */
+        .investment-profile-btn {
+            display: inline-block;
+            padding: 10px 24px;
+            background: #0079FF;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: all 0.2s;
+            margin-top: auto;
+        }
+
+        .investment-profile-btn:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 121, 255, 0.3);
+        }
+
+        /* Decision List View Styles */
+        .decisions-list {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .list-view .decisions-grid {
+            display: none;
+        }
+
+        .list-view .decisions-list {
+            display: block;
+        }
+
+        .list-header {
+            display: grid;
+            grid-template-columns: 60px 140px 1fr 150px 120px 100px;
+            padding: 15px 20px;
+            background: #001C66;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            gap: 20px;
+        }
+
+        .list-row {
+            display: grid;
+            grid-template-columns: 60px 140px 1fr 150px 120px 100px;
+            padding: 20px;
+            border-bottom: 1px solid #e2e8f0;
+            align-items: center;
+            transition: all 0.2s;
+            cursor: pointer;
+            gap: 20px;
+        }
+
+        .list-row:hover {
+            background: #d7dde8;
+            transform: translateX(4px);
+            border-left: 4px solid #0079FF;
+        }
+
+        /* Modal Overlay for Cards from List View */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 28, 102, 0.8);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+            cursor: pointer;
+        }
+
+        .modal-overlay.active {
+            display: block;
+        }
+
+        .modal-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 800px;
+            margin: 40px auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: slideDown 0.3s ease;
+            cursor: default;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 32px;
+            height: 32px;
+            background: #f1f5f9;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            color: #001c66;
+            font-size: 18px;
+        }
+
+        .modal-close:hover {
+            background: #e2e8f0;
+            color: #001c66;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .decisions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .view-toggle {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+            
+            .list-header,
+            .list-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .list-header > *,
+            .list-row > * {
+                text-align: left;
+            }
+        }
+        /* Last-updated timestamp in header */
+        #lastUpdated {
+            position: absolute;
+            top: 18px;
+            right: 24px;
+            color: #001c66;
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">AOM Tooling Governance: Decision Log</h1>
+            <p class="dashboard-subtitle">Decision router & tracker</p>
+            <div id="lastUpdated">Last updated: —</div>
+            
+            <div class="summary-stats">
+                <div class="summary-stat">
+                    <div class="summary-value" id="totalDecisions">0</div>
+                    <div class="summary-label">Total Decisions</div>
+                </div>
+                <div class="summary-stat">
+                    <div class="summary-value" id="completedDecisions">0</div>
+                    <div class="summary-label">Implemented</div>
+                </div>
+                <div class="summary-stat">
+                    <div class="summary-value" id="approvedDecisions">0</div>
+                    <div class="summary-label">Approved</div>
+                </div>
+                <div class="summary-stat">
+                    <div class="summary-value" id="shapingDecisions">0</div>
+                    <div class="summary-label">Shaping</div>
+                </div>
+                <div class="summary-stat">
+                    <div class="summary-value" id="backlogDecisions">0</div>
+                    <div class="summary-label">Backlog</div>
+                </div>
+            </div>
+            
+            <div class="filter-controls">
+                <div class="decision-status-filter">
+                    <span class="filter-label">Decision Status:</span>
+                    <div class="custom-dropdown" id="decisionStatusDropdown">
+                        <div class="dropdown-header" onclick="toggleDropdown('decisionStatusDropdown')">
+                            <span id="decisionStatusLabel">All</span>
+                        </div>
+                        <div class="dropdown-content">
+                            <label class="dropdown-option">
+                                <input type="checkbox" value="all" checked onchange="handleAllStatusChange(this)"> All
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="decision-level-filter">
+                    <span class="filter-label">Ultimate Decision Level:</span>
+                    <div class="custom-dropdown" id="decisionLevelDropdown">
+                        <div class="dropdown-header" onclick="toggleDropdown('decisionLevelDropdown')">
+                            <span id="decisionLevelLabel">All</span>
+                        </div>
+                        <div class="dropdown-content">
+                            <label class="dropdown-option">
+                                <input type="checkbox" value="all" checked onchange="handleAllLevelChange(this)"> All
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="view-toggle">
+                    <button class="view-btn active" onclick="setView('grid')">Grid</button>
+                    <button class="view-btn" onclick="setView('list')">List</button>
+                </div>
+                
+                <a href="https://bramblesgroup.sharepoint.com/sites/anom-governance/SitePages/aom-tool-decision-investment-profile.aspx" target="_blank" class="investment-profile-btn">
+                    Investment Profile
+                </a>
+            </div>
+        </div>
+        
+        <div id="decisionsContainer">
+            <!-- Grid View -->
+            <div class="decisions-grid" id="decisionsGrid"></div>
+            
+            <!-- List View -->
+            <div class="decisions-list" id="decisionsList">
+                <div class="list-header">
+                    <div>ID</div>
+                    <div>Decision Level</div>
+                    <div>Decision Name</div>
+                    <div>Category</div>
+                    <div>Status</div>
+                    <div>Progress</div>
+                </div>
+                <div id="listContent"></div>
+            </div>
+        </div>
+        
+        <!-- Modal Overlay for displaying cards from list view -->
+        <div id="modalOverlay" class="modal-overlay"></div>
+    </div>
+
+    <script>
+        // Decisions array will be populated from CSV
+        let decisions = [];
+        let currentView = 'grid';
+        let currentlyOpenModalId = null;
+
+        // Format date with a short timezone abbreviation when possible, fallback to UTC offset
+        function formatWithShortTZ(d) {
+            try {
+                const opts = { year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZoneName: 'short' };
+                const formatter = new Intl.DateTimeFormat(undefined, opts);
+                const formatted = formatter.format(d);
+                // Try to detect if the formatter included a timezone part
+                if (typeof formatter.formatToParts === 'function') {
+                    const parts = formatter.formatToParts(d);
+                    const tz = parts.find(p => p.type === 'timeZoneName');
+                    if (tz && tz.value) return formatted;
+                } else {
+                    return formatted;
+                }
+
+                // Fallback: build ISO-like local string with UTC offset
+                const pad = n => String(n).padStart(2, '0');
+                const yyyy = d.getFullYear();
+                const mm = pad(d.getMonth() + 1);
+                const dd = pad(d.getDate());
+                const hh = pad(d.getHours());
+                const min = pad(d.getMinutes());
+                const ss = pad(d.getSeconds());
+                const offset = -d.getTimezoneOffset();
+                const sign = offset >= 0 ? '+' : '-';
+                const absOffset = Math.abs(offset);
+                const offH = pad(Math.floor(absOffset / 60));
+                const offM = pad(absOffset % 60);
+                return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss} UTC${sign}${offH}:${offM}`;
+            } catch (e) {
+                return d.toLocaleString();
+            }
+        }
+
+        // Function to get color for decision level badge
+        function getDecisionLevelColor(level) {
+            const levelLower = (level || '').toLowerCase();
+            if (levelLower === 'i&t steerco') return '#001C66';  // Dark Blue
+            if (levelLower === 'trb') return '#8F29FC';   // Purple
+            if (levelLower === 'srb') return '#AD5321'; // Brown/Orange
+            if (levelLower === 'global d&a function') return '#0079FF'; // Bright Blue
+            return '#6b7280'; // Default gray for others
+        }
+
+        // Function to load decisions from CSV file using PapaParse
+        async function loadDecisionsFromCSV() {
+            try {
+                const timestamp = new Date().getTime();
+                const response = await fetch(`decision-log.csv?t=${timestamp}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const csvText = await response.text();
+                
+                const parseResult = Papa.parse(csvText, {
+                    header: true,
+                    skipEmptyLines: true,
+                    dynamicTyping: false,
+                    delimiter: ',',
+                    quoteChar: '"',
+                    escapeChar: '"',
+                    trimHeaders: true
+                });
+                
+                // Transform parsed data to our format
+                decisions = parseResult.data.map((row, idx) => {
+                    const rawStatus = row.decision_status || row['decision_status'] || '';
+                    
+                    // Parse steps (pipe-separated)
+                    const stepsRaw = row.steps || '';
+                    const stepNames = stepsRaw ? stepsRaw.split('|').map(s => s.trim()) : [];
+                    
+                    // Parse completed steps
+                    const completedRaw = row.completed_steps || '';
+                    let completedIndices = [];
+                    if (completedRaw) {
+                        const parts = completedRaw.split(',').map(s => s.trim());
+                        completedIndices = parts.map(part => {
+                            const num = parseFloat(part);
+                            return Math.floor(num);
+                        }).filter(n => !isNaN(n) && n > 0);
+                    }
+                    
+                    // Create step objects
+                    const stepsArray = stepNames.map((name, idx) => ({
+                        name: name,
+                        completed: completedIndices.includes(idx + 1)
+                    }));
+                    
+                    // Parse motivation (pipe-separated)
+                    const motivationRaw = row.decision_motivation || '';
+                    const motivationItems = motivationRaw ? motivationRaw.split('|').map(s => s.trim()).filter(s => s) : [];
+                    
+                    let status = rawStatus || 'Backlog';
+                    status = status.trim();
+                    
+                    // Get decision_id from CSV column as a string value
+                    let decisionId = row.decision_id;
+                    if (!decisionId || decisionId.trim() === '') {
+                        console.warn(`Missing decision_id for row ${idx + 1}, using fallback`);
+                        decisionId = `${idx + 1}`; // Use row number as string fallback
+                    } else {
+                        decisionId = decisionId.trim(); // Keep as string, just trim whitespace
+                    }
+                    
+                    return {
+                        decision_id: decisionId,
+                        decision_name: row.decision_name || `Decision ${idx + 1}`,
+                        decision_category: row.decision_category || 'Unknown',
+                        decision_description: row.decision_description || '',
+                        decision_material: row.decision_material || '',
+                        group_discussion: row.group_discussion || '',
+                        decision_status: status,
+                        decision_level: row.decision_level || '',
+                        steps: stepsArray.length > 0 ? stepsArray : [{ name: 'No steps defined', completed: false }],
+                        completed_steps: completedIndices,
+                        contact_group: row.contact_group || '',
+                        // prefer `quorum` column, fall back to legacy `quorate` for compatibility
+                        quorum: row.quorum || row.quorate || row['quorum'] || row['quorate'] || '',
+                            // use `implementation_lead` column from CSV (fallback to rapporteur)
+                            lead_facilitator: row.implementation_lead || row.rapporteur || '',
+                            rapporteur: row.rapporteur || '',
+                            decision_motivation: motivationItems  // Add motivation field
+                    };
+                }).filter(d => d.decision_name && d.decision_name !== '');
+                
+                // Sort decisions by decision_id in ascending order (natural alphanumeric sort)
+                decisions.sort((a, b) => {
+                    // Natural sort comparison that handles alphanumeric strings properly
+                    return a.decision_id.localeCompare(b.decision_id, undefined, {
+                        numeric: true,
+                        sensitivity: 'base'
+                    });
+                });
+                
+                console.log(`Successfully loaded ${decisions.length} decisions from CSV`);
+
+                // Show last-updated time from server if available, otherwise use current time
+                try {
+                    const lm = response.headers.get('Last-Modified') || response.headers.get('last-modified');
+                    if (lm) {
+                        const parsed = new Date(lm);
+                        if (!isNaN(parsed)) {
+                            document.getElementById('lastUpdated').textContent = `Last updated: ${formatWithShortTZ(parsed)}`;
+                        } else {
+                            document.getElementById('lastUpdated').textContent = `Last updated: ${formatWithShortTZ(new Date())}`;
+                        }
+                    } else {
+                        document.getElementById('lastUpdated').textContent = `Last updated: ${formatWithShortTZ(new Date())} (fetched)`;
+                    }
+                } catch (err) {
+                    document.getElementById('lastUpdated').textContent = `Last updated: ${formatWithShortTZ(new Date())}`;
+                }
+
+                populateFilters();
+                applyFilters();
+
+                // Check URL parameters after data is loaded
+                checkURLParametersAndOpenModal();
+                
+            } catch (error) {
+                console.error('Error loading CSV:', error);
+                
+                // Fallback sample data with motivation
+                decisions = [
+                    {
+                        decision_id: "1",
+                        decision_name: "Customer Analytics Platform",
+                        decision_category: "Customer Intelligence",
+                        decision_description: "Implementing a comprehensive analytics platform to gain deeper insights into customer behavior, preferences, and journey patterns across all touchpoints.",
+                        decision_material: "https://example.com/analytics-platform-docs",
+                        group_discussion: "https://example.com/discussion-forum",
+                        decision_status: "Shaping",
+                        decision_level: "I&T SteerCo",
+                        steps: [
+                            { name: "Identify Requirements", completed: true },
+                            { name: "Shape Solution", completed: true },
+                            { name: "Describe Options", completed: true },
+                            { name: "Consult Stakeholders", completed: false },
+                            { name: "Finalize Decision", completed: false }
+                        ],
+                        rapporteur: "john.analyst@company.com",
+                        contact_group: "Analytics Team | Data Engineering",
+                        decision_motivation: [
+                            "Improve customer retention by 25% through better understanding of behavior patterns",
+                            "Reduce marketing spend waste by targeting the right customers with personalized campaigns",
+                            "Enable real-time decision making for customer service teams"
+                        ]
+                    },
+                    {
+                        decision_id: "2",
+                        decision_name: "Marketing Attribution Tool",
+                        decision_category: "Marketing",
+                        decision_description: "Selecting and implementing a multi-touch attribution solution to better understand marketing channel effectiveness and optimize spend allocation.",
+                        decision_material: "https://example.com/attribution-research",
+                        group_discussion: "https://example.com/marketing-discussion",
+                        decision_status: "Shaping",
+                        decision_level: "TRB",
+                        steps: [
+                            { name: "Research Tools", completed: true },
+                            { name: "Define Budget", completed: true },
+                            { name: "Vendor Evaluation", completed: false },
+                            { name: "Pilot Testing", completed: false }
+                        ],
+                        rapporteur: "sarah.marketing@company.com",
+                        contact_group: "Marketing Ops | Analytics Team",
+                        decision_motivation: [
+                            "Understand true ROI of marketing channels to optimize $10M annual marketing budget",
+                            "Move beyond last-click attribution to understand full customer journey",
+                            "Align marketing and sales teams with shared performance metrics"
+                        ]
+                    },
+                    {
+                        decision_id: "3",
+                        decision_name: "Data Warehouse Migration",
+                        decision_category: "Infrastructure",
+                        decision_description: "Migrating our data warehouse to a more scalable cloud solution.",
+                        decision_material: "",
+                        group_discussion: "",
+                        decision_status: "Implemented",
+                        decision_level: "SRB",
+                        steps: [
+                            { name: "Assess Current State", completed: true },
+                            { name: "Evaluate Options", completed: true },
+                            { name: "Migration Planning", completed: true },
+                            { name: "Execute Migration", completed: true }
+                        ],
+                        rapporteur: "mike.dataeng@company.com",
+                        contact_group: "Data Engineering",
+                        decision_motivation: [
+                            "Reduce infrastructure costs by 40% through cloud migration",
+                            "Improve query performance by 10x for analytical workloads",
+                            "Enable real-time data streaming capabilities"
+                        ]
+                    },
+                    {
+                        decision_id: "4",
+                        decision_name: "AI Ethics Framework",
+                        decision_category: "Governance",
+                        decision_description: "Establishing comprehensive ethical guidelines for AI model deployment.",
+                        decision_material: "",
+                        group_discussion: "",
+                        decision_status: "Approved",
+                        decision_level: "Global D&A Function",
+                        steps: [
+                            { name: "Form Ethics Committee", completed: true },
+                            { name: "Draft Guidelines", completed: true },
+                            { name: "Legal Review", completed: true },
+                            { name: "Board Approval", completed: true },
+                            { name: "Implementation", completed: false }
+                        ],
+                        rapporteur: "lisa.ethics@company.com",
+                        contact_group: "Ethics Board | Legal | Data Science",
+                        decision_motivation: [
+                            "Ensure compliance with emerging AI regulations",
+                            "Build customer trust through transparent AI practices",
+                            "Mitigate reputational risks from AI bias incidents"
+                        ]
+                    }
+                ];
+                
+                // Sort fallback decisions by decision_id as well
+                decisions.sort((a, b) => {
+                    return a.decision_id.localeCompare(b.decision_id, undefined, {
+                        numeric: true,
+                        sensitivity: 'base'
+                    });
+                });
+                
+                populateFilters();
+                applyFilters();
+                // For offline fallback/sample data show a local timestamp
+                try {
+                    document.getElementById('lastUpdated').textContent = `Last updated: ${formatWithShortTZ(new Date())} (local fallback)`;
+                } catch (err) {
+                    // ignore
+                }
+            }
+        }
+
+        function populateFilters() {
+            // Populate status filter
+            const statusDropdown = document.getElementById('decisionStatusDropdown').querySelector('.dropdown-content');
+            const uniqueStatuses = [...new Set(decisions
+                .map(d => d.decision_status)
+                .filter(status => status && status.trim() !== '')
+            )].sort();
+            
+            statusDropdown.innerHTML = `
+                <label class="dropdown-option">
+                    <input type="checkbox" value="all" checked onchange="handleAllStatusChange(this)"> All
+                </label>
+            `;
+            
+            uniqueStatuses.forEach(status => {
+                const option = document.createElement('label');
+                option.className = 'dropdown-option';
+                option.innerHTML = `
+                    <input type="checkbox" value="${status}" onchange="handleIndividualStatusChange(this)"> ${status}
+                `;
+                statusDropdown.appendChild(option);
+            });
+
+            // Populate level filter with predefined values in specific order
+            const levelDropdown = document.getElementById('decisionLevelDropdown').querySelector('.dropdown-content');
+            const predefinedLevels = ['I&T SteerCo', 'TRB', 'SRB', 'Global D&A Function'];
+            
+            levelDropdown.innerHTML = `
+                <label class="dropdown-option">
+                    <input type="checkbox" value="all" checked onchange="handleAllLevelChange(this)"> All
+                </label>
+            `;
+            
+            predefinedLevels.forEach(level => {
+                const option = document.createElement('label');
+                option.className = 'dropdown-option';
+                option.innerHTML = `
+                    <input type="checkbox" value="${level}" onchange="handleIndividualLevelChange(this)"> ${level}
+                `;
+                levelDropdown.appendChild(option);
+            });
+        }
+
+        // Handle "All" checkbox changes for status
+        function handleAllStatusChange(allCheckbox) {
+            const otherCheckboxes = document.querySelectorAll('#decisionStatusDropdown input[type="checkbox"]:not([value="all"])');
+            
+            if (allCheckbox.checked) {
+                // Check all individual items
+                otherCheckboxes.forEach(cb => cb.checked = true);
+            } else {
+                // Uncheck all individual items
+                otherCheckboxes.forEach(cb => cb.checked = false);
+            }
+            
+            updateStatusLabel();
+            applyFilters();
+        }
+
+        // Handle individual status checkbox changes
+        function handleIndividualStatusChange(checkbox) {
+            const allCheckbox = document.querySelector('#decisionStatusDropdown input[value="all"]');
+            const otherCheckboxes = document.querySelectorAll('#decisionStatusDropdown input[type="checkbox"]:not([value="all"])');
+            
+            // Check if all individual items are now selected
+            const allIndividualChecked = Array.from(otherCheckboxes).every(cb => cb.checked);
+            
+            if (allIndividualChecked) {
+                allCheckbox.checked = true;
+            } else {
+                allCheckbox.checked = false;
+            }
+            
+            updateStatusLabel();
+            applyFilters();
+        }
+
+        // Handle "All" checkbox changes for level
+        function handleAllLevelChange(allCheckbox) {
+            const otherCheckboxes = document.querySelectorAll('#decisionLevelDropdown input[type="checkbox"]:not([value="all"])');
+            
+            if (allCheckbox.checked) {
+                // Check all individual items
+                otherCheckboxes.forEach(cb => cb.checked = true);
+            } else {
+                // Uncheck all individual items
+                otherCheckboxes.forEach(cb => cb.checked = false);
+            }
+            
+            updateLevelLabel();
+            applyFilters();
+        }
+
+        // Handle individual level checkbox changes
+        function handleIndividualLevelChange(checkbox) {
+            const allCheckbox = document.querySelector('#decisionLevelDropdown input[value="all"]');
+            const otherCheckboxes = document.querySelectorAll('#decisionLevelDropdown input[type="checkbox"]:not([value="all"])');
+            
+            // Check if all individual items are now selected
+            const allIndividualChecked = Array.from(otherCheckboxes).every(cb => cb.checked);
+            
+            if (allIndividualChecked) {
+                allCheckbox.checked = true;
+            } else {
+                allCheckbox.checked = false;
+            }
+            
+            updateLevelLabel();
+            applyFilters();
+        }
+
+        // Update status dropdown label
+        function updateStatusLabel() {
+            const label = document.getElementById('decisionStatusLabel');
+            const checkedBoxes = document.querySelectorAll('#decisionStatusDropdown input[type="checkbox"]:checked:not([value="all"])');
+            
+            if (document.querySelector('#decisionStatusDropdown input[value="all"]').checked) {
+                label.textContent = 'All';
+            } else if (checkedBoxes.length === 0) {
+                label.textContent = 'None';
+            } else if (checkedBoxes.length === 1) {
+                label.textContent = checkedBoxes[0].value;
+            } else {
+                label.textContent = `${checkedBoxes.length} selected`;
+            }
+        }
+
+        // Update level dropdown label
+        function updateLevelLabel() {
+            const label = document.getElementById('decisionLevelLabel');
+            const checkedBoxes = document.querySelectorAll('#decisionLevelDropdown input[type="checkbox"]:checked:not([value="all"])');
+            
+            if (document.querySelector('#decisionLevelDropdown input[value="all"]').checked) {
+                label.textContent = 'All';
+            } else if (checkedBoxes.length === 0) {
+                label.textContent = 'None';
+            } else if (checkedBoxes.length === 1) {
+                label.textContent = checkedBoxes[0].value;
+            } else {
+                label.textContent = `${checkedBoxes.length} selected`;
+            }
+        }
+
+        // Get selected statuses
+        function getSelectedStatuses() {
+            const checkedBoxes = document.querySelectorAll('#decisionStatusDropdown input[type="checkbox"]:checked');
+            return Array.from(checkedBoxes).map(cb => cb.value);
+        }
+
+        // Get selected levels
+        function getSelectedLevels() {
+            const checkedBoxes = document.querySelectorAll('#decisionLevelDropdown input[type="checkbox"]:checked');
+            return Array.from(checkedBoxes).map(cb => cb.value);
+        }
+
+        function applyFilters() {
+            const selectedStatuses = getSelectedStatuses();
+            const selectedLevels = getSelectedLevels();
+            
+            let filteredDecisions = decisions;
+            
+            // Apply status filter
+            if (selectedStatuses.includes('all')) {
+                // Show all statuses
+            } else if (selectedStatuses.length === 0) {
+                // Show none
+                filteredDecisions = [];
+            } else {
+                // Show only selected statuses
+                filteredDecisions = filteredDecisions.filter(d => {
+                    return selectedStatuses.includes(d.decision_status);
+                });
+            }
+            
+            // Apply level filter (only if we still have decisions)
+            if (filteredDecisions.length > 0) {
+                if (selectedLevels.includes('all')) {
+                    // Show all levels
+                } else if (selectedLevels.length === 0) {
+                    // Show none
+                    filteredDecisions = [];
+                } else {
+                    // Show only selected levels
+                    filteredDecisions = filteredDecisions.filter(d => {
+                        return selectedLevels.includes(d.decision_level);
+                    });
+                }
+            }
+            
+            // Ensure filtered decisions maintain ascending order by decision_id
+            filteredDecisions.sort((a, b) => {
+                return a.decision_id.localeCompare(b.decision_id, undefined, {
+                    numeric: true,
+                    sensitivity: 'base'
+                });
+            });
+            
+            renderDecisions(filteredDecisions);
+        }
+
+        function renderDecisions(filteredDecisions) {
+            const gridContainer = document.getElementById('decisionsGrid');
+            const listContainer = document.getElementById('listContent');
+            
+            gridContainer.innerHTML = filteredDecisions.map(d => createDecisionCard(d)).join('');
+            listContainer.innerHTML = filteredDecisions.map(d => createListRow(d)).join('');
+            
+            updateSummaryStats();
+        }
+
+        function toggleDropdown(dropdownId) {
+            // Close other dropdowns
+            document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
+                if (dropdown.id !== dropdownId) {
+                    dropdown.classList.remove('open');
+                    dropdown.querySelector('.dropdown-content').classList.remove('open');
+                }
+            });
+            
+            // Toggle current dropdown
+            const dropdown = document.getElementById(dropdownId);
+            const content = dropdown.querySelector('.dropdown-content');
+            dropdown.classList.toggle('open');
+            content.classList.toggle('open');
+        }
+
+        function calculateProgress(steps) {
+            if (!steps || steps.length === 0) return 0;
+            const completed = steps.filter(s => s.completed).length;
+            return Math.round((completed / steps.length) * 100);
+        }
+
+        function createProgressRing(progress) {
+            const circumference = 220;
+            const offset = circumference - (progress / 100 * circumference);
+            
+            return `
+                <div class="progress-ring">
+                    <svg width="80" height="80">
+                        <circle cx="40" cy="40" r="35" fill="none" stroke="#e2e8f0" stroke-width="8"/>
+                        <circle cx="40" cy="40" r="35" fill="none" stroke="${progress === 100 ? '#10b981' : '#0079FF'}" 
+                                stroke-width="8" class="progress-ring-circle"
+                                style="stroke-dashoffset: ${offset}"/>
+                    </svg>
+                    <div class="progress-ring-value">${progress}%</div>
+                </div>
+            `;
+        }
+
+        function createMiniSteps(steps) {
+            return steps.map((step, index) => {
+                const completed = step.completed;
+                const active = !completed && steps.slice(0, index).every(s => s.completed);
+                return `
+                    <div class="mini-step ${completed ? 'completed' : ''} ${active ? 'active' : ''}">
+                        <span class="mini-step-tooltip">${step.name}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function createDecisionCard(decision) {
+            const progress = calculateProgress(decision.steps);
+            const stepCount = decision.steps ? decision.steps.length : 0;
+            
+            // Use consistent color for all status badges
+            const statusBgColor = '#E5E7EB'; // Light grey background
+            const statusTextColor = '#0A142D'; // Dark text
+            
+            const displayStatus = decision.decision_status || 'Unknown';
+            const levelColor = getDecisionLevelColor(decision.decision_level);
+            
+            return `
+                <div class="decision-card" id="${decision.decision_id.toLowerCase()}" data-id="${decision.decision_id}" onclick="toggleDecisionModal('${decision.decision_id}')">
+                    <div class="card-top-badges">
+                        <div>
+                            ${decision.decision_level ? `
+                            <span class="level-badge" style="background: ${levelColor}">
+                                ${decision.decision_level}
+                            </span>
+                            ` : ''}
+                        </div>
+                        <div>
+                            <span class="status-badge" style="background: ${statusBgColor}; color: ${statusTextColor}">
+                                ${displayStatus}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-header">
+                        <div class="card-id">Decision ${decision.decision_id}</div>
+                        <div class="card-title">${decision.decision_name}</div>
+                        <div class="card-category">${decision.decision_category}</div>
+                    </div>
+                    
+                    <div class="progress-section">
+                        ${createProgressRing(progress)}
+                        <div class="mini-steps">
+                            ${createMiniSteps(decision.steps)}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createListRow(decision) {
+            const progress = calculateProgress(decision.steps);
+            const levelColor = getDecisionLevelColor(decision.decision_level);
+            
+            return `
+                <div class="list-row" onclick="toggleDecisionModal('${decision.decision_id}')">
+                    <div>${decision.decision_id}</div>
+                    <div>
+                        ${decision.decision_level ? `
+                        <span class="level-badge" style="background: ${levelColor}; display: inline-block;">
+                            ${decision.decision_level}
+                        </span>
+                        ` : '-'}
+                    </div>
+                    <div style="font-weight: 600; color: #001C66;">${decision.decision_name}</div>
+                    <div>${decision.decision_category}</div>
+                    <div>
+                        <span class="status-badge" style="background: #E5E7EB; color: #0A142D; display: inline-block;">
+                            ${decision.decision_status || 'Unknown'}
+                        </span>
+                    </div>
+                    <div style="text-align: center; font-weight: 700; color: ${progress === 100 ? '#10b981' : '#0079FF'};">
+                        ${progress}%
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateSummaryStats() {
+            const totalDecisions = decisions.length;
+            
+            const completedDecisions = decisions.filter(d => {
+                const status = (d.decision_status || '').trim().toLowerCase();
+                return status === 'implemented';
+            }).length;
+            
+            const approvedDecisions = decisions.filter(d => {
+                const status = (d.decision_status || '').trim().toLowerCase();
+                return status === 'approved';
+            }).length;
+            
+            const shapingDecisions = decisions.filter(d => {
+                const status = (d.decision_status || '').trim().toLowerCase();
+                return status === 'shaping';
+            }).length;
+            
+            const backlogDecisions = decisions.filter(d => {
+                const status = (d.decision_status || '').trim().toLowerCase();
+                return status === 'backlog';
+            }).length;
+            
+            document.getElementById('totalDecisions').textContent = totalDecisions;
+            document.getElementById('completedDecisions').textContent = completedDecisions;
+            document.getElementById('approvedDecisions').textContent = approvedDecisions;
+            document.getElementById('shapingDecisions').textContent = shapingDecisions;
+            document.getElementById('backlogDecisions').textContent = backlogDecisions;
+        }
+
+        // Toggle decision modal from card or list view
+        function toggleDecisionModal(decisionId) {
+            const decision = decisions.find(d => d.decision_id === decisionId);
+            if (!decision) return;
+            
+            const modalOverlay = document.getElementById('modalOverlay');
+            
+            // If this modal is already open, close it
+            if (currentlyOpenModalId === decisionId && modalOverlay.classList.contains('active')) {
+                closeModal();
+                return;
+            }
+            
+            // Open the new modal
+            currentlyOpenModalId = decisionId;
+            modalOverlay.innerHTML = `
+                <div class="modal-card" onclick="event.stopPropagation()">
+                    <button class="modal-close" onclick="closeModal()">✕</button>
+                    ${renderDetailedDecision(decision)}
+                </div>
+            `;
+            modalOverlay.classList.add('active');
+        }
+        
+        // Render detailed decision view (for modals)
+        function renderDetailedDecision(decision) {
+            const progress = calculateProgress(decision.steps);
+            const levelColor = getDecisionLevelColor(decision.decision_level);
+            
+            return `
+                <div style="margin-bottom: 25px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                        <div>
+                            <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+                                ${decision.decision_level ? `
+                                <span class="level-badge" style="background: ${levelColor}; font-size: 0.85em;">
+                                    ${decision.decision_level}
+                                </span>
+                                ` : ''}
+                                <span class="status-badge" style="background: #E5E7EB; color: #0A142D; font-size: 0.85em;">
+                                    ${decision.decision_status || 'Unknown'}
+                                </span>
+                            </div>
+                            <h2 style="font-size: 1.8em; color: #001c66; margin-bottom: 5px;">
+                                Decision ${decision.decision_id}: ${decision.decision_name}
+                            </h2>
+                        </div>
+                    </div>
+                    
+                    
+                    ${(decision.decision_description || decision.decision_material || decision.group_discussion) ? `
+                    <div style="margin-bottom: 30px; padding: 20px; background: #fafafa; border-radius: 12px; border: 1px solid #e2e8f0;">
+                        <div style="font-size: 0.9em; color: #001c66; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">Decision Description</div>
+                        ${decision.decision_description ? `
+                        <div style="margin-bottom: ${(decision.decision_material || decision.group_discussion) ? '16px' : '0'};">
+                            <p style="color: #001c66; font-size: 1em; line-height: 1.6;">${decision.decision_description}</p>
+                        </div>
+                        ` : ''}
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            ${decision.decision_material ? `
+                            <a href="${decision.decision_material}" target="_blank" style="display: inline-block; text-decoration: none;">
+                                <button style="padding: 12px 24px; background: #0079FF; color: white; border: none; border-radius: 8px; font-size: 0.95em; font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 8px;">
+                                    Decision material
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M5 12L19 12M19 12L12 5M19 12L12 19"/>
+                                    </svg>
+                                </button>
+                            </a>
+                            ` : ''}
+                            ${decision.group_discussion ? `
+                            <a href="${decision.group_discussion}" target="_blank" style="display: inline-block; text-decoration: none;">
+                                <button style="padding: 12px 24px; background: #444791; color: white; border: none; border-radius: 8px; font-size: 0.95em; font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 8px;">
+                                    Decision Group Teams chat
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M5 12L19 12M19 12L12 5M19 12L12 19"/>
+                                    </svg>
+                                </button>
+                            </a>
+                            ` : ''}
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    <div style="display: flex; gap: 30px; align-items: flex-start;">
+                        <div style="display: flex; flex-direction: column; gap: 20px;">
+                            ${decision.lead_facilitator || decision.rapporteur || decision.contact_group ? `
+                            <div style="min-width: 200px; padding: 20px; background: #f8fafc; border-radius: 12px;">
+                                <div style="font-size: 0.9em; color: #001c66; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">Implementation Lead</div>
+                                <div style="font-size: 0.95em; color: ${decision.lead_facilitator || decision.rapporteur ? '#001c66' : '#001c66'}; font-style: ${decision.lead_facilitator || decision.rapporteur ? 'normal' : 'italic'};">
+                                    ${decision.lead_facilitator || decision.rapporteur || 'Not assigned'}
+                                </div>
+                            </div>
+                            ` : ''}
+
+                            <!-- QUORATE box: same size/style as Lead Facilitator, shown immediately below it -->
+                            ${(() => {
+                                const qRaw = (decision.quorum || '');
+                                const q = qRaw.trim().toLowerCase();
+                                let labelColor = '#001c66';
+                                let statusText = '';
+
+                                if (q === 'green') {
+                                    labelColor = '#10b981'; // green
+                                    statusText = 'Yes';
+                                } else if (q === 'amber') {
+                                    labelColor = '#ffb020'; // amber
+                                    statusText = 'Partial';
+                                } else if (q === 'red') {
+                                    labelColor = '#ef4444'; // red
+                                    statusText = 'No';
+                                }
+
+                                // Keep the "QUORATE:" label in a fixed color (match Implementation Lead)
+                                // Render a small colored badge and make the inner icon larger/bolder for amber
+                                const icon = (q === 'green') ? '✔' : (q === 'amber') ? '!' : (q === 'red') ? '✖' : '';
+                                // Badge container style (fixed badge size)
+                                const baseIconStyle = `background: ${labelColor}; color: #ffffff; border-radius: 12px; line-height:1; display:inline-block; padding: 4px 8px;`;
+                                // Inner icon style: larger and bolder for amber only
+                                const innerIconStyle = (q === 'amber') ? 'font-size: 1.2em; font-weight: 900; display:inline-block; line-height:1;' : 'font-size: 1em; font-weight: 700; display:inline-block; line-height:1;';
+                                const iconStyle = baseIconStyle;
+                                return `
+                                    <div style="min-width: 200px; padding: 8px 15px; background: #f8fafc; border-radius: 12px; display: flex; align-items: center;">
+                                        <div style="font-size: 0.9em; color: #001c66; letter-spacing: 0.5px; font-weight: 700; display:flex; align-items:center;">
+                                            <span style="text-transform: uppercase; color: #001c66;">QUORUM:</span>
+                                            ${icon ? `
+                                                <span style="display:inline-flex; align-items:center; justify-content:center; margin-left:8px;">
+                                                    <span aria-hidden="true" style="${iconStyle}"><span style="${innerIconStyle}">${icon}</span></span>
+                                                </span>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                `;
+                            })()}
+
+                            ${decision.contact_group ? `
+                            <div style="min-width: 200px; padding: 20px; background: #f8fafc; border-radius: 12px;">
+                                <div style="font-size: 0.9em; color: #001c66; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">Decision Design Group</div>
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    ${decision.contact_group.split('|').map(name => name.trim()).filter(name => name).map((name, index) => `
+                                        <div style="font-size: 1em; color: #001c66; font-weight: 500; padding: 6px 0; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center;">
+                                            <span style="color: #001c66; margin-right: 10px; font-weight: 600; font-size: 0.9em;">${index + 1}.</span>
+                                            ${name}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            ` : ''}
+
+                            <!-- Quorum legend -->
+                            <div style="min-width: 200px; padding: 12px 20px; background: #ffffff; border-radius: 12px; margin-top: 8px; border: 1px solid #e2e8f0;">
+                                <div style="font-size: 0.85em; color: #001c66; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">QUORUM...</div>
+                                <div style="display:flex; flex-direction:column; gap:8px; font-size:0.95em; color:#001c66;">
+                                    <div style="display:flex; align-items:center; gap:8px;">
+                                        <span style="display:inline-flex; align-items:center; justify-content:center; min-width:34px; background:#10b981; color:#fff; border-radius:8px; padding:4px 8px; font-weight:700;">✔</span>
+                                        <span>We've got the right people on it</span>
+                                    </div>
+                                    <div style="display:flex; align-items:center; gap:8px;">
+                                        <span style="display:inline-flex; align-items:center; justify-content:center; min-width:34px; background:#ffb020; color:#fff; border-radius:8px; padding:4px 8px; font-weight:700;">!</span>
+                                        <span>Good enough to get going</span>
+                                    </div>
+                                    <div style="display:flex; align-items:center; gap:8px;">
+                                        <span style="display:inline-flex; align-items:center; justify-content:center; min-width:34px; background:#ef4444; color:#fff; border-radius:8px; padding:4px 8px; font-weight:700;">✖</span>
+                                        <span>Not sufficient yet</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="flex: 1;">
+                            <h3 style="font-size: 1.1em; color: #001c66; margin-bottom: 20px;">Pre- & Post- conditions: ${progress}%</h3>
+                            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
+                                <div style="flex: 1; height: 12px; background: #e2e8f0; border-radius: 6px;">
+                                    <div style="width: ${progress}%; height: 100%; background: ${progress === 100 ? '#10b981' : '#0079FF'}; border-radius: 6px; transition: width 0.3s;"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="detailed-steps">
+                                ${decision.steps.map((step, index) => {
+                                    const completed = step.completed;
+                                    const active = !completed && decision.steps.slice(0, index).every(s => s.completed);
+                                    return `
+                                        <div class="detailed-step ${completed ? 'completed' : ''} ${active ? 'active' : ''}">
+                                            <div class="detailed-step-indicator">
+                                                ${completed ? '✔' : index + 1}
+                                            </div>
+                                            <div class="detailed-step-content">
+                                                <div class="detailed-step-title">${step.name}</div>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function closeModal() {
+            const modalOverlay = document.getElementById('modalOverlay');
+            modalOverlay.classList.remove('active');
+            modalOverlay.innerHTML = '';
+            currentlyOpenModalId = null; // Reset the currently open modal ID
+        }
+
+        function setView(view) {
+            currentView = view;
+            document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const container = document.getElementById('decisionsContainer');
+            if (view === 'list') {
+                container.classList.add('list-view');
+            } else {
+                container.classList.remove('list-view');
+            }
+        }
+
+        function setViewDirect(view) {
+            currentView = view;
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if ((view === 'grid' && btn.textContent === 'Grid') || 
+                    (view === 'list' && btn.textContent === 'List')) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            const container = document.getElementById('decisionsContainer');
+            if (view === 'list') {
+                container.classList.add('list-view');
+            } else {
+                container.classList.remove('list-view');
+            }
+        }
+
+        // Check URL parameters and open corresponding decision modal
+        function checkURLParametersAndOpenModal() {
+            console.log('Checking URL parameters...');
+            
+            // Check query parameters first (e.g., ?decision=aom-01)
+            const urlParams = new URLSearchParams(window.location.search);
+            let decisionParam = urlParams.get('decision');
+            
+            console.log('Query parameter "decision":', decisionParam);
+            
+            // If no query parameter, check for hash anchor (e.g., #aom-01)
+            if (!decisionParam && window.location.hash) {
+                decisionParam = window.location.hash.substring(1); // Remove the # symbol
+                console.log('Hash anchor found:', decisionParam);
+            }
+            
+            if (decisionParam) {
+                console.log(`Decision parameter found: ${decisionParam}`);
+                console.log(`Total decisions loaded: ${decisions.length}`);
+                
+                if (decisions.length > 0) {
+                    // Convert parameter to uppercase to match decision IDs (e.g., aom-01 -> AOM-01)
+                    const decisionId = decisionParam.toUpperCase();
+                    console.log(`Looking for decision ID: ${decisionId}`);
+                    
+                    // Log all available decision IDs for debugging
+                    console.log('Available decision IDs:', decisions.map(d => d.decision_id));
+                    
+                    // Find the decision with matching ID
+                    const decision = decisions.find(d => d.decision_id === decisionId);
+                    
+                    if (decision) {
+                        console.log(`Found decision:`, decision);
+                        // Small delay to ensure DOM is ready
+                        setTimeout(() => {
+                            toggleDecisionModal(decision.decision_id);
+                            // Optionally scroll to top of modal
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }, 300);
+                    } else {
+                        console.log(`Decision ${decisionId} not found in loaded decisions`);
+                    }
+                } else {
+                    console.log('No decisions loaded yet');
+                }
+            } else {
+                console.log('No decision parameter found in URL');
+            }
+        }
+
+        // Initialize dashboard
+        window.addEventListener('DOMContentLoaded', () => {
+            // Immediate diagnostic - check if URL has parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const decisionParam = urlParams.get('decision');
+            if (decisionParam) {
+                console.log('IMMEDIATE CHECK: URL has decision parameter:', decisionParam);
+                alert('URL parameter detected: ' + decisionParam);
+            }
+            
+            loadDecisionsFromCSV();
+            
+            // Add ESC key listener to close modals and dropdowns
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape' || event.key === 'Esc') {
+                    // Check if modal is open first
+                    const modalOverlay = document.getElementById('modalOverlay');
+                    if (modalOverlay && modalOverlay.classList.contains('active')) {
+                        closeModal();
+                        return;
+                    }
+                    
+                    // Close any open dropdowns
+                    document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
+                        dropdown.classList.remove('open');
+                        dropdown.querySelector('.dropdown-content').classList.remove('open');
+                    });
+                }
+            });
+            
+            // Close modal or dropdowns when clicking outside
+            document.addEventListener('click', function(event) {
+                const modalOverlay = document.getElementById('modalOverlay');
+                
+                // Close modal if clicking on the overlay itself or modal content
+                if (modalOverlay && modalOverlay.classList.contains('active')) {
+                    // Check if click was on the overlay itself or inside the modal content
+                    if (event.target === modalOverlay || event.target.closest('.modal-card')) {
+                        closeModal();
+                        return;
+                    }
+                }
+                
+                // Close dropdowns when clicking outside
+                if (!event.target.closest('.custom-dropdown')) {
+                    document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
+                        dropdown.classList.remove('open');
+                        dropdown.querySelector('.dropdown-content').classList.remove('open');
+                    });
+                }
+            });
+        });
+        
+        // Listen for messages from parent SharePoint page (for iframe scenarios)
+        window.addEventListener('message', function(event) {
+            console.log('Received message:', event.data);
+            if (event.data && event.data.type === 'openDecision' && event.data.decisionId) {
+                console.log('Opening decision from postMessage:', event.data.decisionId);
+                // Wait for decisions to be loaded
+                const checkAndOpen = setInterval(function() {
+                    if (decisions.length > 0) {
+                        clearInterval(checkAndOpen);
+                        toggleDecisionModal(event.data.decisionId);
+                    }
+                }, 100);
+                // Stop checking after 10 seconds
+                setTimeout(function() { clearInterval(checkAndOpen); }, 10000);
+            }
+        });
+    </script>
+</body>
+</html>
