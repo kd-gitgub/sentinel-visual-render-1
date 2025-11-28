@@ -256,19 +256,14 @@
 
         const grid = document.getElementById('card-grid');
 
-        // Generate 20 vertical bars with semi-random heights based on demand value
+        // Generate 30 vertical bars with equal heights
         function generateDemandBars(demandVal, color) {
             let barClass = color === 'red' ? 'bar-red' : color === 'orange' ? 'bar-orange' : 'bar-green';
             let bars = '';
             
-            // Generate 20 bars with varying heights that trend around the demand value
-            for (let i = 0; i < 20; i++) {
-                // Create variation: base height with some randomness
-                const variation = (Math.random() - 0.5) * 20; // +/- 10%
-                const barHeight = Math.max(10, Math.min(100, demandVal + variation));
-                const heightPercent = barHeight + '%';
-                
-                bars += `<div class="demand-bar ${barClass}" style="height: ${heightPercent};"></div>`;
+            // Generate 30 bars with equal height (100%)
+            for (let i = 0; i < 30; i++) {
+                bars += `<div class="demand-bar ${barClass}" style="height: 100%;"></div>`;
             }
             
             return bars;
