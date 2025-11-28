@@ -18,15 +18,16 @@
         /* Demand-Ability Bar Chart */
         .demand-bars {
             display: flex;
-            gap: 1.5px;
+            gap: 2px;
             height: 40px;
             align-items: flex-end;
             image-rendering: crisp-edges;
             image-rendering: pixelated;
+            flex: 1;
         }
         
         .demand-bar {
-            width: 5px;
+            width: 4px;
             height: 40px;
             flex-shrink: 0;
             transition: all 0.3s ease;
@@ -407,11 +408,11 @@
                         <!-- Demand-Ability Bars (Full Width) -->
                         <div class="flex flex-col mb-4">
                             <div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Demand-Ability</div>
-                            <div class="flex items-center gap-4">
+                            <div class="flex items-center justify-between">
                                 <div class="demand-bars">
                                     ${generateDemandBars(card.demand.val, card.id)}
                                 </div>
-                                <div class="text-sm font-bold ${chartTextClass}">${card.demand.val}%</div>
+                                <div class="text-sm font-bold ${chartTextClass} ml-3">${card.demand.val}%</div>
                             </div>
                         </div>
 
