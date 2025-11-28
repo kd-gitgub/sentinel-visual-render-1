@@ -41,6 +41,7 @@
 
         /* Status Dot Colors */
         .status-dot-red { background-color: #ef4444; box-shadow: 0 0 0 2px #7f1d1d; }
+        .status-dot-orange { background-color: #eab308; box-shadow: 0 0 0 2px #854d0e; }
         .status-dot-green { background-color: #84cc16; box-shadow: 0 0 0 2px #365314; }
 
         /* Tooltip Logic */
@@ -261,37 +262,18 @@
 
         const grid = document.getElementById('card-grid');
 
+        // Get the most recent day's demand status for an agent
+        function getMostRecentDayStatus(agentId) {
+            const pattern = agentPatterns[agentId];
+            if (pattern) {
+                return pattern[29]; // Last day (index 29)
+            }
+            return 'green'; // Default
+        }
+
         // Generate 30 vertical bars representing 30 days of historical demand data
         function generateDemandBars(currentDemandVal, agentId) {
             let bars = '';
-            
-            // Define specific patterns for each agent (days 1-30, left to right)
-            const agentPatterns = {
-                'AG-01': Array(30).fill('green'),  // All green
-                'AG-02': Array(30).fill('green').map((val, idx) => {
-                    if (idx === 22) return 'red';     // Day 23 (index 22) is red
-                    if (idx === 23) return 'orange';  // Day 24 (index 23) is amber
-                    return val;
-                }),
-                'AG-03': Array(30).fill('green'),  // All green
-                'AG-04': Array(30).fill('green'),  // All green
-                'AG-05': Array(30).fill('green').map((val, idx) => {
-                    return idx < 12 ? 'red' : 'green';  // Days 1-12 red, 13-30 green
-                }),
-                'AG-06': Array(30).fill('green'),  // Default pattern
-                'AG-07': Array(30).fill('green').map((val, idx) => {
-                    return idx === 29 ? 'orange' : val;  // Day 30 (most recent, index 29) is amber
-                }),
-                'AG-08': Array(30).fill('green'),  // Default pattern
-                'AG-09': Array(30).fill('green'),  // Default pattern
-                'AG-10': Array(30).fill('green').map((val, idx) => {
-                    return idx >= 27 ? 'red' : val;  // Days 28, 29, 30 (last 3, indices 27-29) are red
-                }),
-                'AG-11': Array(30).fill('green').map((val, idx) => {
-                    return (idx === 4 || idx === 5) ? 'orange' : val;  // Days 5 & 6 (indices 4, 5) are amber
-                }),
-                'AG-12': Array(30).fill('green')   // Default pattern
-            };
             
             // Get pattern for this agent, or use default varied pattern
             const pattern = agentPatterns[agentId];
@@ -331,6 +313,45 @@
             
             return bars;
         }
+
+        // Define agentPatterns globally so it can be accessed by both functions
+        const agentPatterns = {
+            'AG-01': Array(30).fill('green'),
+            'AG-02': Array(30).fill('green').map((val, idx) => {
+                if (idx === 22) return 'red';
+                if (idx === 23) return 'orange';
+                return val;
+            }),
+            'AG-03': Array(30).fill('green'),
+            'AG-04': Array(30).fill('green'),
+            'AG-05': Array(30).fill('green').map((val, idx) => {
+                return idx < 12 ? 'red' : 'green';
+            }),
+            'AG-06': Array(30).fill('green'),
+            'AG-07': Array(30).fill('green').map((val, idx) => {
+                return idx === 29 ? 'orange' : val;
+            }),Determine status dot color based on most recent demand day
+            const recentDayStatus = getMostRecentDayStatus(card.id);
+            let statusDotClass;
+            if (recentDayStatus === 'red') {
+                statusDotClass = 'status-dot-red';
+            } else if (recentDayStatus === 'orange') {
+                statusDotClass = 'status-dot-orange';
+            } else {
+                statusDotClass = 'status-dot-green';
+            }
+            
+            // statusDotClass
+            'AG-08': Array(30).fill('green'),
+            'AG-09': Array(30).fill('green'),
+            'AG-10': Array(30).fill('green').map((val, idx) => {
+                return idx >= 27 ? 'red' : val;
+            }),
+            'AG-11': Array(30).fill('green').map((val, idx) => {
+                return (idx === 4 || idx === 5) ? 'orange' : val;
+            }),
+            'AG-12': Array(30).fill('green')
+        };
 
         cards.forEach(card => {
             // Icon Logic
