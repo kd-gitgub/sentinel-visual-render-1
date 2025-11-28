@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safety & Alignment Monitor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap');
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        /* Custom Donut Chart Classes using Conic Gradients */
+        .donut-ring {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .donut-ring::after {
+            content: "";
+            position: absolute;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background-color: white;
+        }
+
+        .donut-content {
+            position: relative;
+            z-index: 10;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        /* Chart Variants */
+        .chart-96 { background: conic-gradient(#ef4444 0% 96%, #e5e7eb 96% 100%); }
+        .chart-94 { background: conic-gradient(#ef4444 0% 94%, #e5e7eb 94% 100%); }
+        .chart-86 { background: conic-gradient(#f97316 0% 86%, #e5e7eb 86% 100%); }
+        .chart-70 { background: conic-gradient(#84cc16 0% 70%, #e5e7eb 70% 100%); }
+        .chart-65 { background: conic-gradient(#84cc16 0% 65%, #e5e7eb 65% 100%); }
+        .chart-60 { background: conic-gradient(#84cc16 0% 60%, #e5e7eb 60% 100%); }
+        .chart-78 { background: conic-gradient(#f97316 0% 78%, #e5e7eb 78% 100%); }
+        .chart-46 { background: conic-gradient(#84cc16 0% 46%, #e5e7eb 46% 100%); }
+        .chart-34 { background: conic-gradient(#84cc16 0% 34%, #e5e7eb 34% 100%); }
+        .chart-33 { background: conic-gradient(#84cc16 0% 33%, #e5e7eb 33% 100%); }
+        .chart-89 { background: conic-gradient(#f97316 0% 89%, #e5e7eb 89% 100%); }
+        .chart-27 { background: conic-gradient(#84cc16 0% 27%, #e5e7eb 27% 100%); }
+
+        /* Status Dot Colors */
+        .status-dot-red { background-color: #ef4444; box-shadow: 0 0 0 2px #7f1d1d; }
+        .status-dot-green { background-color: #84cc16; box-shadow: 0 0 0 2px #365314; }
+
+        /* Tooltip Logic */
+        .has-tooltip:hover .tooltip-content {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .tooltip-content {
+            visibility: hidden;
+            opacity: 0;
+            transform: translateY(4px);
+            transition: all 0.2s;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Main Header -->
+    <header class="bg-[#004680] text-white p-6 pb-8">
+        <h1 class="text-2xl font-bold mb-4">Safety & Alignment Monitor</h1>
+        <div class="flex flex-wrap gap-4 text-xs font-bold tracking-wide">
+            <div class="flex items-center bg-white/10 rounded-full px-3 py-1.5 border border-white/20">
+                <span class="w-2 h-2 rounded-full bg-red-500 mr-2"></span>
+                ACTIVE THREATS: 3
+            </div>
+            <div class="flex items-center bg-white/10 rounded-full px-3 py-1.5 border border-white/20">
+                <span class="w-2 h-2 rounded-full bg-yellow-500 mr-2"></span>
+                HIGH LOAD: 4
+            </div>
+            <div class="flex items-center bg-white/10 rounded-full px-3 py-1.5 border border-white/20">
+                <!-- Fingerprint Icon SVG -->
+                <svg class="w-3 h-3 mr-2 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.2-2.848.578-4.13m4.896-.757C8.636 6.046 7.842 6 7 6a6 6 0 00-6 6"></path></svg>
+                PII ALERTS: 4
+            </div>
+        </div>
+    </header>
+
+    <!-- Dashboard Grid -->
+    <main class="p-4 -mt-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="card-grid">
+            <!-- Cards will be injected here by JS -->
+        </div>
+    </main>
+
+    <script>
+        // Data Structure
+        const cards = [
+            {
+                id: "AG-01",
+                name: "FinTech-Advisor-1-01",
+                model: "GPT-4o",
+                status: "red",
+                privacy: { status: "PII ALERT / SSN", type: "warning" },
+                demand: { val: 96, color: "red" },
+                malice: "4.9",
+                maliceColor: "red",
+                toxicity: "3.8",
+                grounding: "1.2", 
+                context: "93k",
+                step: "11/20"
+            },
+            {
+                id: "AG-02",
+                name: "Support-Agent-2-02",
+                model: "Claude-3.5-Sonnet",
+                status: "green",
+                privacy: { status: "SECURE", type: "secure" },
+                demand: { val: 70, color: "green" },
+                malice: "1.4",
+                maliceColor: "dark",
+                toxicity: "1.4",
+                grounding: "4.8", 
+                context: "104k",
+                step: "15/20"
+            },
+            {
+                id: "AG-03",
+                name: "Code-Gen-3-03",
+                model: "Mistral-Large",
+                status: "green",
+                privacy: { status: "SECURE", type: "secure" },
+                demand: { val: 65, color: "green" },
+                malice: "1.4",
+                maliceColor: "dark",
+                toxicity: "1.3",
+                grounding: "4.5",
+                context: "75k",
+                step: "17/20"
+            },
+            {
+                id: "AG-04",
+                name: "HR-Helper-4-04",
+                model: "Llama-3-70B",
+                status: "green",
+                privacy: { status: "SECURE", type: "secure" },
+                demand: { val: 60, color: "green" },
+                malice: "1.6",
+                maliceColor: "dark",
+                toxicity: "0.8",
+                grounding: "4.9",
+                context: "103k",
+                step: "18/20"
+            },
+            {
+                id: "AG-05",
+                name: "Legal-Bot-0-05",
+                model: "GPT-4o",
+                status: "red",
+                privacy: { status: "PII ALERT / Credit Card", type: "warning" },
+                demand: { val: 94, color: "red" },
+                malice: "4.7",
+                maliceColor: "red",
+                toxicity: "4.1",
+                grounding: "2.1",
+                context: "53k",
+                step: "12/20"
+            },
+            {
+                id: "AG-06",
+                name: "FinTech-Advisor-1-06",
+                model: "Claude-3.5-Sonnet",
+                status: "green",
+                privacy: { status: "PII ALERT / Credit Card", type: "warning" },
+                demand: { val: 78, color: "orange" },
+                malice: "1.7",
+                maliceColor: "dark",
+                toxicity: "1.8",
+                grounding: "3.5",
+                context: "41k",
+                step: "6/20"
+            },
+            {
+                id: "AG-07",
+                name: "Support-Agent-2-07",
+                model: "Mistral-Large",
+                status: "green",
+                privacy: { status: "SECURE", type: "secure" },
+                demand: { val: 46, color: "green" },
+                malice: "1.3",
+                maliceColor: "dark",
+                toxicity: "0.9",
+                grounding: "4.7",
+                context: "58k",
+                step: "12/20"
+            },
+            {
+                id: "AG-08",
+                name: "Code-Gen-3-08",
+                model: "Llama-3-70B",
+                status: "green",
+                privacy: { status: "SECURE", type: "secure" },
+                demand: { val: 34, color: "green" },
+                malice: "0.6",
+                maliceColor: "dark",
+                toxicity: "0.9",
+                grounding: "5.0",
+                context: "39k",
+                step: "3/20"
+            },
+            {
+                id: "AG-09",
+                name: "HR-Helper-4-09",
+                model: "GPT-4o",
+                status: "green",
+                privacy: { status: "SECURE", type: "secure" },
+                demand: { val: 33, color: "green" },
+                malice: "1.9",
+                maliceColor: "dark",
+                toxicity: "1.1",
+                grounding: "4.6",
+                context: "35k",
+                step: "10/20"
+            },
+            {
+                id: "AG-10",
+                name: "Legal-Bot-0-10",
+                model: "Claude-3.5-Sonnet",
+                status: "red",
+                privacy: { status: "PII ALERT / Credit Card", type: "warning" },
+                demand: { val: 86, color: "orange" },
+                malice: "4.6",
+                maliceColor: "red",
+                toxicity: "4.0",
+                grounding: "2.8",
+                context: "31k",
+                step: "12/20"
+            },
+            {
+                id: "AG-11",
+                name: "FinTech-Advisor-1-11",
+                model: "Mistral-Large",
+                status: "green",
+                privacy: { status: "SECURE", type: "secure" },
+                demand: { val: 89, color: "orange" },
+                malice: "0.7",
+                maliceColor: "dark",
+                toxicity: "1.6",
+                grounding: "3.9",
+                context: "36k",
+                step: "12/20"
+            },
+            {
+                id: "AG-12",
+                name: "Support-Agent-2-12",
+                model: "Llama-3-70B",
+                status: "green",
+                privacy: { status: "SECURE", type: "secure" },
+                demand: { val: 27, color: "green" },
+                malice: "1.3",
+                maliceColor: "dark",
+                toxicity: "0.9",
+                grounding: "4.4",
+                context: "8k",
+                step: "11/20"
+            }
+        ];
+
+        const grid = document.getElementById('card-grid');
+
+        cards.forEach(card => {
+            // Icon Logic
+            const fingerprintPath = "M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.2-2.848.578-4.13m4.896-.757C8.636 6.046 7.842 6 7 6a6 6 0 00-6 6";
+            
+            const privacyIcon = card.privacy.type === 'warning' 
+                ? `<svg class="w-4 h-4 mr-1.5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${fingerprintPath}"></path></svg>`
+                : `<svg class="w-4 h-4 mr-1.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${fingerprintPath}"></path></svg>`;
+
+            const privacyClass = card.privacy.type === 'warning' ? 'text-orange-500 font-bold' : 'text-[#66cc00] font-bold';
+            
+            const chartTextClass = card.demand.color === 'red' ? 'text-red-500' : 
+                                   card.demand.color === 'orange' ? 'text-orange-400' : 'text-[#84cc16]';
+
+            const maliceClass = card.maliceColor === 'red' ? 'text-red-500' : 'text-gray-900';
+            const toxicityClass = card.maliceColor === 'red' ? 'text-red-500' : 'text-gray-900';
+            
+            // Grounding color logic
+            let groundingClass = 'text-gray-800';
+            const gVal = parseFloat(card.grounding);
+            if (gVal >= 4.0) groundingClass = 'text-[#84cc16]'; 
+            else if (gVal <= 2.5) groundingClass = 'text-red-500';
+            else groundingClass = 'text-gray-800';
+
+            const html = `
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col">
+                    <!-- Card Header -->
+                    <div class="bg-[#0a1930] p-3 flex justify-between items-start">
+                        <div class="mt-1">
+                            <div class="w-4 h-4 rounded-full ${card.status === 'red' ? 'status-dot-red' : 'status-dot-green'}"></div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-white font-bold text-sm tracking-tight">${card.name}</div>
+                            <div class="text-gray-400 text-[10px] font-medium mt-0.5">${card.id} | ${card.model}</div>
+                        </div>
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="p-4 flex-grow">
+                        <!-- Privacy Row -->
+                        <div class="flex items-center text-[10px] uppercase font-bold tracking-wider text-gray-500 mb-4">
+                            <span class="mr-2">Data Privacy:</span>
+                            <div class="flex items-center ${privacyClass}">
+                                ${privacyIcon}
+                                ${card.privacy.status}
+                            </div>
+                        </div>
+
+                        <!-- Metrics Row -->
+                        <div class="flex justify-between items-start">
+                            <!-- Donut Chart -->
+                            <div class="flex flex-col items-center mt-2">
+                                <div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Demand-Ability</div>
+                                <div class="donut-ring chart-${card.demand.val}">
+                                    <div class="donut-content ${chartTextClass}">${card.demand.val}%</div>
+                                </div>
+                            </div>
+
+                            <!-- Malice/Toxicity/Grounding Stats -->
+                            <div class="flex flex-col items-end space-y-2">
+                                <div>
+                                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider text-right">Malice</div>
+                                    <div class="text-3xl font-bold ${maliceClass} leading-none text-right">${card.malice}</div>
+                                </div>
+                                
+                                <div>
+                                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider text-right">Toxicity</div>
+                                    <div class="text-2xl font-bold ${toxicityClass} leading-none text-right">${card.toxicity}</div>
+                                </div>
+
+                                <div>
+                                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider text-right">Grounding</div>
+                                    <div class="text-xl font-bold ${groundingClass} leading-none text-right">${card.grounding}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer Info (Agentic Health) -->
+                    <div class="bg-gray-50/50 px-4 py-3 border-t border-gray-100 flex justify-between items-center text-xs font-semibold text-gray-500 relative">
+                        
+                        <!-- Context Usage Tooltip -->
+                        <div class="flex items-center cursor-help has-tooltip group relative">
+                            <div class="tooltip-content absolute bottom-full left-0 mb-2 px-2 py-1 bg-gray-800 text-white text-[10px] rounded shadow-lg whitespace-nowrap z-20">
+                                Risk: "Lost in the Middle" Syndrome<br>Buffer Usage / Max
+                            </div>
+                            <!-- Chip Icon -->
+                            <svg class="w-4 h-4 mr-1.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
+                            ${card.context} Context
+                        </div>
+
+                        <!-- Step/Time Horizon Tooltip -->
+                        <div class="flex items-center cursor-help has-tooltip group relative">
+                            <div class="tooltip-content absolute bottom-full right-0 mb-2 px-2 py-1 bg-gray-800 text-white text-[10px] rounded shadow-lg whitespace-nowrap z-20 text-right">
+                                Agentic Time Horizon<br>Monitor for Loop Failures
+                            </div>
+                            <!-- Pulse Icon -->
+                            <svg class="w-4 h-4 mr-1.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            Step ${card.step}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            grid.innerHTML += html;
+        });
+    </script>
+</body>
+</html>
