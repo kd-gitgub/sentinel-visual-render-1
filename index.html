@@ -65,18 +65,23 @@
     <!-- Main Header -->
     <header class="bg-[#0A142D] rounded-none p-6 mb-8 shadow-xl max-w-[1400px] mx-auto">
         <h1 class="text-2xl font-bold mb-4 text-white">Agent Safety & Alignment</h1>
-        <div class="flex flex-wrap gap-6 text-sm font-semibold">
-            <div class="flex items-center">
-                <span class="w-2.5 h-2.5 rounded-full bg-red-500 mr-2"></span>
-                <span class="text-white">ACTIVE THREATS: 3</span>
+        <div class="flex flex-wrap justify-between gap-6 text-sm font-semibold">
+            <div class="flex flex-wrap gap-6">
+                <div class="flex items-center">
+                    <span class="w-2.5 h-2.5 rounded-full bg-red-500 mr-2"></span>
+                    <span class="text-white">ACTIVE THREATS: 3</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="w-2.5 h-2.5 rounded-full bg-yellow-500 mr-2"></span>
+                    <span class="text-white">HIGH LOAD: 4</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="w-2.5 h-2.5 rounded-full bg-cyan-500 mr-2"></span>
+                    <span class="text-white">PII ALERTS: 4</span>
+                </div>
             </div>
             <div class="flex items-center">
-                <span class="w-2.5 h-2.5 rounded-full bg-yellow-500 mr-2"></span>
-                <span class="text-white">HIGH LOAD: 4</span>
-            </div>
-            <div class="flex items-center">
-                <span class="w-2.5 h-2.5 rounded-full bg-cyan-500 mr-2"></span>
-                <span class="text-white">PII ALERTS: 4</span>
+                <span class="text-white">CAPTIVE AGENTS: <span id="captive-count">0</span></span>
             </div>
         </div>
     </header>
@@ -263,6 +268,9 @@
 
         const grid = document.getElementById('card-grid');
 
+        // Update captive agents count
+        document.getElementById('captive-count').textContent = cards.length;
+
         // Get the most recent day's demand status for an agent
         function getMostRecentDayStatus(agentId) {
             const pattern = agentPatterns[agentId];
@@ -363,9 +371,7 @@
             // Icon Logic
             const fingerprintPath = "M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.2-2.848.578-4.13m4.896-.757C8.636 6.046 7.842 6 7 6a6 6 0 00-6 6";
             
-            const privacyIcon = card.privacy.type === 'warning' 
-                ? `<svg class="w-4 h-4 mr-1.5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${fingerprintPath}"></path></svg>`
-                : `<svg class="w-4 h-4 mr-1.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${fingerprintPath}"></path></svg>`;
+            const privacyIcon = `<svg class="w-4 h-4 mr-1.5 text-[#0a1930]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${fingerprintPath}"></path></svg>`;
 
             const privacyClass = card.privacy.type === 'warning' ? 'text-orange-500 font-bold' : 'text-[#66cc00] font-bold';
             
@@ -392,7 +398,7 @@
                                 <div class="w-5 h-5 rounded-full ${statusDotClass} mt-0.5"></div>
                                 <div class="text-white text-base font-bold">${card.id.replace('AG-', 'AG-0')}</div>
                             </div>
-                            <div class="text-gray-400 text-[10px] font-medium" style="margin-left: 30px;">Platform: Databricks</div>
+                            <div class="text-gray-400 text-[10px] font-medium" style="margin-left: 30px;">Host: Databricks</div>
                         </div>
                         <div class="text-right">
                             <div class="text-white font-bold text-base tracking-tight">${card.name}</div>
@@ -403,7 +409,7 @@
                     <!-- Card Body -->
                     <div class="p-4 flex-grow">
                         <!-- Privacy Row -->
-                        <div class="flex items-center text-[10px] uppercase font-bold tracking-wider text-gray-500 mb-4">
+                        <div class="flex items-center text-[10px] uppercase font-bold tracking-wider text-[#0a1930] mb-4">
                             <span class="mr-2">Data Privacy:</span>
                             <div class="flex items-center ${privacyClass}">
                                 ${privacyIcon}
@@ -413,39 +419,46 @@
 
                         <!-- Demand-Ability Bars (Full Width) -->
                         <div class="flex flex-col mb-4">
-                            <div class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Demand-Ability</div>
+                            <div class="text-[10px] font-bold text-[#0a1930] uppercase tracking-wider mb-2">Demand-Ability</div>
                             <div class="flex items-center justify-between">
                                 <div class="demand-bars">
                                     ${generateDemandBars(card.demand.val, card.id)}
                                 </div>
+<<<<<<< HEAD
+                                <div class="flex flex-col items-start ml-2 mr-1">
+                                    <div class="text-sm font-bold ${chartTextClass} leading-none">${card.demand.val}%</div>
+                                    <div class="text-[10px] font-bold ${chartTextClass} uppercase tracking-wider mt-0.5">Now</div>
+                                </div>
+=======
                                 <div class="flex flex-col items-center ml-1.5 mr-1">
                                     <div class="text-sm font-bold ${chartTextClass} leading-none">${card.demand.val}%</div>
                                     <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-0.5">Now</div>
                                 </div>
+>>>>>>> aba3fa694e0f97c4526f3fd9e6624e4913b47414
                             </div>
                         </div>
 
                         <!-- Malice/Toxicity/Grounding Stats Row -->
                         <div class="flex justify-between items-center gap-4">
                             <div class="flex flex-col items-center flex-1">
-                                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Malice</div>
+                                <div class="text-[10px] font-bold text-[#0a1930] uppercase tracking-wider">Malice</div>
                                 <div class="text-xl font-bold ${maliceClass} leading-none mt-1">${card.malice}</div>
                             </div>
                             
                             <div class="flex flex-col items-center flex-1">
-                                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Toxicity</div>
+                                <div class="text-[10px] font-bold text-[#0a1930] uppercase tracking-wider">Toxicity</div>
                                 <div class="text-xl font-bold ${toxicityClass} leading-none mt-1">${card.toxicity}</div>
                             </div>
 
                             <div class="flex flex-col items-center flex-1">
-                                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Grounding</div>
+                                <div class="text-[10px] font-bold text-[#0a1930] uppercase tracking-wider">Grounding</div>
                                 <div class="text-xl font-bold ${groundingClass} leading-none mt-1">${card.grounding}</div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Footer Info (Agentic Health) -->
-                    <div class="bg-gray-50/50 px-4 py-3 border-t border-gray-100 flex justify-between items-center text-xs font-semibold text-gray-500 relative">
+                    <div class="bg-gray-50/50 px-4 py-3 border-t border-gray-100 flex justify-between items-center text-xs font-semibold text-[#0a1930] relative">
                         
                         <!-- Context Usage Tooltip -->
                         <div class="flex items-center cursor-help has-tooltip group relative">
