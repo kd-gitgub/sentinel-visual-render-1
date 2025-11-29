@@ -43,6 +43,7 @@
         .bar-orange { background-color: #eab308; }
         .bar-green { background-color: #84cc16; }
         .bar-gray { background-color: #e5e7eb; }
+        .bar-dark { background-color: #0A142D; }
 
         /* Status Dot Colors */
         .status-dot-red { 
@@ -339,15 +340,15 @@
             return bars;
         }
 
-        // Generate blocking rate bars (all green)
+        // Generate blocking rate bars (all dark blue)
         function generateBlockingBars(agentId) {
             let bars = '';
-            // Generate 30 green bars
+            // Generate 30 dark blue bars
             for (let i = 0; i < 30; i++) {
-                bars += `<div class="demand-bar bar-green"></div>`;
+                bars += `<div class="demand-bar bar-dark"></div>`;
             }
-            // Add 31st green bar
-            bars += `<div class="demand-bar bar-green"></div>`;
+            // Add 31st dark blue bar
+            bars += `<div class="demand-bar bar-dark"></div>`;
             return bars;
         }
 
