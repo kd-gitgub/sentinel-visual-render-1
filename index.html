@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Safety & Alignment Monitor</title>
+    <title>Safety & Alignment</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap');
@@ -78,7 +78,7 @@
 
     <!-- Main Header -->
     <header class="bg-[#0A142D] rounded-none p-6 mb-8 shadow-xl max-w-[1400px] mx-auto">
-        <h1 class="text-2xl font-bold mb-4 text-white">Agent Safety & Alignment</h1>
+        <h1 class="text-2xl font-bold mb-4 text-white">Agent Safety & Alignment <span class="text-sm opacity-70">Version 0.7</span></h1>
         <div class="flex items-center justify-between w-full text-sm font-semibold">
             <div class="flex items-center gap-6">
                 <div class="flex items-center">
@@ -117,7 +117,7 @@
                 demand: { val: 96, color: "red" },
                 malice: "4.9",
                 maliceColor: "red",
-                toxicity: "3.8",
+                toxicity: "3.2",
                 grounding: "1.2", 
                 context: "93k",
                 step: "11/20"
@@ -131,7 +131,7 @@
                 demand: { val: 70, color: "green" },
                 malice: "1.4",
                 maliceColor: "dark",
-                toxicity: "1.4",
+                toxicity: "1.8",
                 grounding: "4.8", 
                 context: "104k",
                 step: "15/20"
@@ -145,7 +145,7 @@
                 demand: { val: 65, color: "green" },
                 malice: "1.4",
                 maliceColor: "dark",
-                toxicity: "1.3",
+                toxicity: "2.1",
                 grounding: "4.5",
                 context: "75k",
                 step: "17/20"
@@ -159,7 +159,7 @@
                 demand: { val: 60, color: "green" },
                 malice: "1.6",
                 maliceColor: "dark",
-                toxicity: "0.8",
+                toxicity: "1.5",
                 grounding: "4.9",
                 context: "103k",
                 step: "18/20"
@@ -173,7 +173,7 @@
                 demand: { val: 94, color: "red" },
                 malice: "4.7",
                 maliceColor: "red",
-                toxicity: "4.1",
+                toxicity: "3.7",
                 grounding: "2.1",
                 context: "53k",
                 step: "12/20"
@@ -187,7 +187,7 @@
                 demand: { val: 78, color: "orange" },
                 malice: "1.7",
                 maliceColor: "dark",
-                toxicity: "1.8",
+                toxicity: "2.3",
                 grounding: "3.5",
                 context: "41k",
                 step: "6/20"
@@ -201,7 +201,7 @@
                 demand: { val: 46, color: "green" },
                 malice: "1.3",
                 maliceColor: "dark",
-                toxicity: "0.9",
+                toxicity: "1.2",
                 grounding: "4.7",
                 context: "58k",
                 step: "12/20"
@@ -215,7 +215,7 @@
                 demand: { val: 34, color: "green" },
                 malice: "0.6",
                 maliceColor: "dark",
-                toxicity: "0.9",
+                toxicity: "0.7",
                 grounding: "5.0",
                 context: "39k",
                 step: "3/20"
@@ -229,7 +229,7 @@
                 demand: { val: 33, color: "green" },
                 malice: "1.9",
                 maliceColor: "dark",
-                toxicity: "1.1",
+                toxicity: "2.4",
                 grounding: "4.6",
                 context: "35k",
                 step: "10/20"
@@ -243,7 +243,7 @@
                 demand: { val: 86, color: "orange" },
                 malice: "4.6",
                 maliceColor: "red",
-                toxicity: "4.0",
+                toxicity: "3.9",
                 grounding: "2.8",
                 context: "31k",
                 step: "12/20"
@@ -257,7 +257,7 @@
                 demand: { val: 89, color: "orange" },
                 malice: "0.7",
                 maliceColor: "dark",
-                toxicity: "1.6",
+                toxicity: "1.9",
                 grounding: "3.9",
                 context: "36k",
                 step: "12/20"
@@ -271,7 +271,7 @@
                 demand: { val: 27, color: "green" },
                 malice: "1.3",
                 maliceColor: "dark",
-                toxicity: "0.9",
+                toxicity: "1.4",
                 grounding: "4.4",
                 context: "8k",
                 step: "11/20"
@@ -392,15 +392,26 @@
             const chartTextClass = recentDayStatus === 'red' ? 'text-red-500' : 
                                    recentDayStatus === 'orange' ? 'text-orange-400' : 'text-[#84cc16]';
 
-            const maliceClass = card.maliceColor === 'red' ? 'text-red-500' : 'text-gray-900';
-            const toxicityClass = card.maliceColor === 'red' ? 'text-red-500' : 'text-gray-900';
+            // Malice color logic
+            const maliceVal = parseFloat(card.malice);
+            let maliceClass;
+            if (maliceVal < 2.2) maliceClass = 'text-[#84cc16]';
+            else if (maliceVal >= 2.2 && maliceVal <= 3.6) maliceClass = 'text-[#eab308]';
+            else maliceClass = 'text-red-500';
+            
+            // Toxicity color logic
+            const toxicityVal = parseFloat(card.toxicity);
+            let toxicityClass;
+            if (toxicityVal < 2.2) toxicityClass = 'text-[#84cc16]';
+            else if (toxicityVal >= 2.2 && toxicityVal <= 3.6) toxicityClass = 'text-[#eab308]';
+            else toxicityClass = 'text-red-500';
             
             // Grounding color logic
-            let groundingClass = 'text-gray-800';
-            const gVal = parseFloat(card.grounding);
-            if (gVal >= 4.0) groundingClass = 'text-[#84cc16]'; 
-            else if (gVal <= 2.5) groundingClass = 'text-red-500';
-            else groundingClass = 'text-gray-800';
+            const groundingVal = parseFloat(card.grounding);
+            let groundingClass;
+            if (groundingVal < 2.2) groundingClass = 'text-[#84cc16]';
+            else if (groundingVal >= 2.2 && groundingVal <= 3.6) groundingClass = 'text-[#eab308]';
+            else groundingClass = 'text-red-500';
 
             const html = `
                 <div class="bg-white shadow-md border-2 border-gray-200 overflow-hidden flex flex-col transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5 cursor-pointer">
