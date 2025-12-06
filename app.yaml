@@ -1,6 +1,0 @@
-name: Agent Safety & Alignment
-description: Real-time agent safety monitoring dashboard
-runtime:
-  language: PYTHON
-  version: "3.11"
-entrypoint: app.py
