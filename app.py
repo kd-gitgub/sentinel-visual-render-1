@@ -567,7 +567,18 @@ st.caption(
 # "streamlit run app.py", bootstrap the Streamlit CLI manually so the
 # ScriptRunContext is created.
 if __name__ == "__main__":
+    import os
     from streamlit.web import cli as stcli
 
-    sys.argv = ["streamlit", "run", __file__, "--server.headless=true", "--server.port=8501"]
+    port = os.environ.get("PORT", "8501")
+    sys.argv = [
+        "streamlit",
+        "run",
+        __file__,
+        "--server.port=" + port,
+        "--server.address=0.0.0.0",
+        "--server.headless=true",
+        "--server.enableCORS=false",
+        "--server.enableXsrfProtection=false",
+    ]
     sys.exit(stcli.main())
