@@ -1,27 +1,13 @@
-"""
-Agent Safety & Alignment Dashboard - Databricks App
-Version 0.7 - Streamlit-based Databricks App
-
-This app serves as a Databricks App that can be powered by:
-1. Real data from Databricks Notebooks (via SQL queries)
-2. Tables in your Databricks workspace
-3. Volumes containing processed data
-
-To deploy in Databricks:
-1. Create a new "App" in your workspace
-2. Upload this file as app.py
-3. Configure the catalog/schema in settings
-"""
-
 import streamlit as st
 import pandas as pd
+import plotly.graph_objects as go
 from datetime import datetime, timedelta
-import random
+import numpy as np
 
-# Configure page
+# Page configuration
 st.set_page_config(
     page_title="Agent Safety & Alignment",
-    page_icon="🔒",
+    page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -29,344 +15,291 @@ st.set_page_config(
 # Custom CSS for styling
 st.markdown("""
     <style>
-        :root {
-            --primary-dark: #0A142D;
-            --accent-red: #ef4444;
-            --accent-orange: #eab308;
-            --accent-green: #84cc16;
-            --text-primary: #000000;
-            --text-secondary: #666666;
-        }
-        
-        body {
-            background-color: #ffffff;
-            color: var(--text-primary);
-            font-family: 'Segoe UI', sans-serif;
-        }
-        
-        .header-container {
-            background-color: var(--primary-dark);
-            padding: 20px;
-            border-radius: 0px;
-            margin-bottom: 20px;
-            color: white;
-        }
-        
-        .metric-card {
-            background-color: white;
-            border: 2px solid #e5e7eb;
-            border-radius: 0px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            transition: all 0.2s ease;
-        }
-        
-        .metric-card:hover {
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            transform: translateY(-2px);
-        }
-        
-        .status-indicator {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-        
-        .status-red {
-            background-color: var(--accent-red);
-            animation: blink 0.6s step-end infinite;
-        }
-        
-        .status-orange {
-            background-color: var(--accent-orange);
-        }
-        
-        .status-green {
-            background-color: var(--accent-green);
-        }
-        
-        @keyframes blink {
-            0%, 49% { opacity: 1; }
-            50%, 100% { opacity: 0; }
-        }
+    /* Main styling */
+    :root {
+        --primary-bg: #ffffff;
+        --header-bg: #0A142D;
+        --text-primary: #000000;
+        --text-secondary: #666666;
+        --border-color: #e5e7eb;
+        --success: #84cc16;
+        --warning: #eab308;
+        --danger: #ef4444;
+        --info: #06b6d4;
+        --dark-blue: #0a1930;
+    }
+    
+    body {
+        background-color: var(--primary-bg);
+    }
+    
+    .header-container {
+        background-color: var(--header-bg);
+        padding: 1.5rem;
+        border-radius: 0;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .header-title {
+        color: white;
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+    
+    .header-subtitle {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.75rem;
+        margin-left: 0.5rem;
+    }
+    
+    .status-row {
+        display: flex;
+        gap: 1.5rem;
+        color: white;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+    
+    .status-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .status-dot {
+        width: 0.625rem;
+        height: 0.625rem;
+        border-radius: 50%;
+    }
+    
+    .status-dot-red {
+        background-color: var(--danger);
+        animation: blink-red 0.6s step-end infinite;
+    }
+    
+    .status-dot-yellow {
+        background-color: var(--warning);
+    }
+    
+    .status-dot-cyan {
+        background-color: var(--info);
+    }
+    
+    @keyframes blink-red {
+        0%, 49% { opacity: 1; }
+        50%, 100% { opacity: 0; }
+    }
     </style>
 """, unsafe_allow_html=True)
 
-# ============================================================================
-# DATA LOADING & PROCESSING FUNCTIONS
-# ============================================================================
-# In production, replace these with actual Databricks SQL queries
+# Data
+AGENTS_DATA = [
+    {
+        "id": "AG-01",
+        "name": "FinTech-Advisor-1-01",
+        "model": "GPT-4o",
+        "status": "red",
+        "privacy": {"status": "PII ALERT / SSN", "type": "warning"},
+        "demand": {"val": 96, "color": "red"},
+        "malice": 4.9,
+        "toxicity": 3.2,
+        "grounding": 1.2,
+        "context": "93k",
+        "step": "11/20"
+    },
+    {
+        "id": "AG-02",
+        "name": "Support-Agent-2-02",
+        "model": "Claude-3.5-Sonnet",
+        "status": "green",
+        "privacy": {"status": "SECURE", "type": "secure"},
+        "demand": {"val": 70, "color": "green"},
+        "malice": 1.4,
+        "toxicity": 1.8,
+        "grounding": 4.8,
+        "context": "104k",
+        "step": "15/20"
+    },
+    {
+        "id": "AG-03",
+        "name": "Code-Gen-3-03",
+        "model": "Mistral-Large",
+        "status": "green",
+        "privacy": {"status": "SECURE", "type": "secure"},
+        "demand": {"val": 65, "color": "green"},
+        "malice": 1.4,
+        "toxicity": 2.1,
+        "grounding": 4.5,
+        "context": "75k",
+        "step": "17/20"
+    },
+    {
+        "id": "AG-04",
+        "name": "HR-Helper-4-04",
+        "model": "Llama-3-70B",
+        "status": "green",
+        "privacy": {"status": "SECURE", "type": "secure"},
+        "demand": {"val": 60, "color": "green"},
+        "malice": 1.6,
+        "toxicity": 1.5,
+        "grounding": 4.9,
+        "context": "103k",
+        "step": "18/20"
+    },
+    {
+        "id": "AG-05",
+        "name": "Legal-Bot-0-05",
+        "model": "GPT-4o",
+        "status": "red",
+        "privacy": {"status": "PII ALERT / Credit Card", "type": "warning"},
+        "demand": {"val": 94, "color": "red"},
+        "malice": 4.7,
+        "toxicity": 3.7,
+        "grounding": 2.1,
+        "context": "53k",
+        "step": "12/20"
+    },
+    {
+        "id": "AG-06",
+        "name": "FinTech-Advisor-1-06",
+        "model": "Claude-3.5-Sonnet",
+        "status": "green",
+        "privacy": {"status": "PII ALERT / Credit Card", "type": "warning"},
+        "demand": {"val": 78, "color": "orange"},
+        "malice": 1.7,
+        "toxicity": 2.3,
+        "grounding": 3.5,
+        "context": "41k",
+        "step": "6/20"
+    },
+    {
+        "id": "AG-07",
+        "name": "Support-Agent-2-07",
+        "model": "Mistral-Large",
+        "status": "green",
+        "privacy": {"status": "SECURE", "type": "secure"},
+        "demand": {"val": 46, "color": "green"},
+        "malice": 1.3,
+        "toxicity": 1.2,
+        "grounding": 4.7,
+        "context": "58k",
+        "step": "12/20"
+    },
+    {
+        "id": "AG-08",
+        "name": "Code-Gen-3-08",
+        "model": "Llama-3-70B",
+        "status": "green",
+        "privacy": {"status": "SECURE", "type": "secure"},
+        "demand": {"val": 34, "color": "green"},
+        "malice": 0.6,
+        "toxicity": 0.7,
+        "grounding": 5.0,
+        "context": "39k",
+        "step": "3/20"
+    },
+    {
+        "id": "AG-09",
+        "name": "HR-Helper-4-09",
+        "model": "GPT-4o",
+        "status": "green",
+        "privacy": {"status": "SECURE", "type": "secure"},
+        "demand": {"val": 33, "color": "green"},
+        "malice": 1.9,
+        "toxicity": 2.4,
+        "grounding": 4.6,
+        "context": "35k",
+        "step": "10/20"
+    },
+    {
+        "id": "AG-10",
+        "name": "Legal-Bot-0-10",
+        "model": "Claude-3.5-Sonnet",
+        "status": "red",
+        "privacy": {"status": "PII ALERT / Credit Card", "type": "warning"},
+        "demand": {"val": 86, "color": "orange"},
+        "malice": 4.6,
+        "toxicity": 3.9,
+        "grounding": 2.8,
+        "context": "31k",
+        "step": "12/20"
+    },
+    {
+        "id": "AG-11",
+        "name": "FinTech-Advisor-1-11",
+        "model": "Mistral-Large",
+        "status": "green",
+        "privacy": {"status": "SECURE", "type": "secure"},
+        "demand": {"val": 89, "color": "orange"},
+        "malice": 0.7,
+        "toxicity": 1.9,
+        "grounding": 3.9,
+        "context": "36k",
+        "step": "12/20"
+    },
+    {
+        "id": "AG-12",
+        "name": "Support-Agent-2-12",
+        "model": "Llama-3-70B",
+        "status": "green",
+        "privacy": {"status": "SECURE", "type": "secure"},
+        "demand": {"val": 27, "color": "green"},
+        "malice": 1.3,
+        "toxicity": 1.4,
+        "grounding": 4.4,
+        "context": "8k",
+        "step": "11/20"
+    },
+]
 
-def load_agent_data():
-    """
-    In production, replace this with:
-    
-    from databricks import sql
-    
-    with sql.connect(host="<workspace-host>",
-                     http_path="<http-path>",
-                     auth_type="pat",
-                     token="<pat-token>") as conn:
-        df = conn.execute("SELECT * FROM your_catalog.schema.agents_table").fetchall()
-    """
-    
-    # Mock data structure - matches your dashboard design
-    data = {
-        "id": ["AG-01", "AG-02", "AG-03", "AG-04", "AG-05", "AG-06", 
-               "AG-07", "AG-08", "AG-09", "AG-10", "AG-11", "AG-12"],
-        "name": ["FinTech-Advisor-1-01", "Support-Agent-2-02", "Code-Gen-3-03", 
-                 "HR-Helper-4-04", "Legal-Bot-0-05", "FinTech-Advisor-1-06",
-                 "Support-Agent-2-07", "Code-Gen-3-08", "HR-Helper-4-09",
-                 "Legal-Bot-0-10", "FinTech-Advisor-1-11", "Support-Agent-2-12"],
-        "model": ["GPT-4o", "Claude-3.5-Sonnet", "Mistral-Large", "Llama-3-70B",
-                  "GPT-4o", "Claude-3.5-Sonnet", "Mistral-Large", "Llama-3-70B",
-                  "GPT-4o", "Claude-3.5-Sonnet", "Mistral-Large", "Llama-3-70B"],
-        "status": ["red", "green", "green", "green", "red", "green",
-                   "green", "green", "green", "red", "green", "green"],
-        "privacy_status": ["PII ALERT / SSN", "SECURE", "SECURE", "SECURE",
-                          "PII ALERT / Credit Card", "PII ALERT / Credit Card",
-                          "SECURE", "SECURE", "SECURE", "PII ALERT / Credit Card",
-                          "SECURE", "SECURE"],
-        "demand": [96, 70, 65, 60, 94, 78, 46, 34, 33, 86, 89, 27],
-        "malice": [4.9, 1.4, 1.4, 1.6, 4.7, 1.7, 1.3, 0.6, 1.9, 4.6, 0.7, 1.3],
-        "toxicity": [3.2, 1.8, 2.1, 1.5, 3.7, 2.3, 1.2, 0.7, 2.4, 3.9, 1.9, 1.4],
-        "grounding": [1.2, 4.8, 4.5, 4.9, 2.1, 3.5, 4.7, 5.0, 4.6, 2.8, 3.9, 4.4],
-        "context": ["93k", "104k", "75k", "103k", "53k", "41k", "58k", "39k", "35k", "31k", "36k", "8k"],
-        "step": ["11/20", "15/20", "17/20", "18/20", "12/20", "6/20", "12/20", "3/20", "10/20", "12/20", "12/20", "11/20"]
-    }
-    return pd.DataFrame(data)
-
-def generate_demand_history(agent_id, current_demand):
-    """Generate 30-day demand history for visualization"""
-    # Mock data - in production, fetch from Databricks
-    base = current_demand
-    history = [base + random.randint(-10, 10) for _ in range(30)]
-    return [max(10, min(98, h)) for h in history]
-
-def get_demand_bars_color(value):
-    """Determine bar color based on demand value"""
-    if value > 75:
-        return "red"
-    elif value >= 50:
-        return "orange"
-    else:
-        return "green"
-
-# ============================================================================
-# HEADER SECTION
-# ============================================================================
-
-col1, col2 = st.columns([2, 1])
-
-with col1:
-    st.markdown("""
-        <div class="header-container">
-            <h1 style="margin: 0; color: white;">Agent Safety & Alignment</h1>
-            <p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.7; color: white;">Version 0.7</p>
+# Header
+st.markdown("""
+    <div style="background-color: #0A142D; padding: 1.5rem; margin-bottom: 2rem; border-radius: 0; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        <div style="color: white; font-size: 2rem; font-weight: bold; margin-bottom: 1rem;">
+            Agent Safety & Alignment <span style="color: rgba(255, 255, 255, 0.7); font-size: 0.75rem;">Version 0.7</span>
         </div>
-    """, unsafe_allow_html=True)
-
-with col2:
-    # Summary stats
-    st.markdown("""
-        <div class="header-container" style="text-align: right;">
-            <div style="display: flex; gap: 16px; justify-content: flex-end;">
-                <div>
-                    <span style="display: inline-block; width: 10px; height: 10px; 
-                          background-color: #ef4444; border-radius: 50%; margin-right: 6px;"></span>
-                    <span style="font-size: 12px;">ACTIVE THREATS: 3</span>
-                </div>
-                <div>
-                    <span style="display: inline-block; width: 10px; height: 10px; 
-                          background-color: #eab308; border-radius: 50%; margin-right: 6px;"></span>
-                    <span style="font-size: 12px;">HIGH LOAD: 4</span>
-                </div>
-                <div>
-                    <span style="display: inline-block; width: 10px; height: 10px; 
-                          background-color: #06b6d4; border-radius: 50%; margin-right: 6px;"></span>
-                    <span style="font-size: 12px;">PII ALERTS: 4</span>
-                </div>
+        <div style="display: flex; gap: 1.5rem; color: white; font-weight: 600; font-size: 0.875rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <div style="width: 0.625rem; height: 0.625rem; border-radius: 50%; background-color: #ef4444;"></div>
+                <span>ACTIVE THREATS: 3</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <div style="width: 0.625rem; height: 0.625rem; border-radius: 50%; background-color: #eab308;"></div>
+                <span>HIGH LOAD: 4</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <div style="width: 0.625rem; height: 0.625rem; border-radius: 50%; background-color: #06b6d4;"></div>
+                <span>PII ALERTS: 4</span>
+            </div>
+            <div style="margin-left: auto;">
+                <span>CAPTIVE AGENTS: 12</span>
             </div>
         </div>
-    """, unsafe_allow_html=True)
+    </div>
+""", unsafe_allow_html=True)
 
-# ============================================================================
-# LOAD DATA & DISPLAY DASHBOARD
-# ============================================================================
+# Dashboard
+st.markdown("### Agent Status Dashboard")
 
-df = load_agent_data()
-
-# Create responsive grid layout
 cols = st.columns(4)
-col_index = 0
-
-for idx, row in df.iterrows():
-    current_col = cols[col_index % 4]
-    col_index += 1
-    
-    with current_col:
-        # Determine status indicator color
-        if row['malice'] > 3.6:
-            status_class = "status-red"
-            status_color = "#ef4444"
-        elif float(row['demand']) > 75:
-            status_class = "status-red"
-            status_color = "#ef4444"
-        elif float(row['demand']) >= 50:
-            status_class = "status-orange"
-            status_color = "#eab308"
-        else:
-            status_class = "status-green"
-            status_color = "#84cc16"
-        
-        # Determine metric colors
-        malice_color = "red" if row['malice'] > 3.6 else ("orange" if row['malice'] >= 2.2 else "black")
-        toxicity_color = "red" if row['toxicity'] > 3.6 else ("orange" if row['toxicity'] >= 2.2 else "black")
-        grounding_color = "red" if row['grounding'] > 3.6 else ("orange" if row['grounding'] >= 2.2 else "black")
-        
-        privacy_color = "orange" if "ALERT" in row['privacy_status'] else "green"
-        
+for idx, agent in enumerate(AGENTS_DATA):
+    with cols[idx % 4]:
         with st.container(border=True):
-            # Header
-            st.markdown(f"""
-                <div style="background-color: #0a1930; padding: 10px; margin: -10px -10px 10px -10px; color: white;">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="display: inline-block; width: 12px; height: 12px; 
-                              background-color: {status_color}; border-radius: 50%;"></span>
-                        <span style="font-weight: bold; font-size: 14px;">{row['id']}</span>
-                    </div>
-                    <div style="font-size: 9px; color: #9ca3af; margin-left: 20px;">Host: Databricks</div>
-                    <div style="font-size: 13px; font-weight: bold; margin-top: 4px;">{row['name']}</div>
-                    <div style="font-size: 9px; color: #9ca3af;">Model: {row['model']}</div>
-                </div>
-            """, unsafe_allow_html=True)
-            
-            # Privacy
-            privacy_text = "🔐 SECURE" if "SECURE" in row['privacy_status'] else "⚠️ " + row['privacy_status']
-            privacy_color_style = "color: #84cc16;" if "SECURE" in row['privacy_status'] else "color: #eab308;"
-            
-            st.markdown(f"""
-                <div style="font-size: 11px; font-weight: bold; margin-bottom: 12px;">
-                    DATA PRIVACY
-                </div>
-                <div style="{privacy_color_style} font-size: 12px; font-weight: bold;">
-                    {privacy_text}
-                </div>
-            """, unsafe_allow_html=True)
-            
+            st.markdown(f"**{agent['id']}** — {agent['name']}")
+            st.caption(f"Model: {agent['model']}")
             st.divider()
             
-            # Demand Ability
-            st.markdown(f"""
-                <div style="font-size: 11px; font-weight: bold; margin-bottom: 8px;">
-                    DEMAND ABILITY
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div style="font-size: 24px; font-weight: bold;">{row['demand']}%</div>
-                    <div style="font-size: 9px; color: #666;">LOAD</div>
-                </div>
-            """, unsafe_allow_html=True)
+            privacy_status = agent["privacy"]["status"]
+            privacy_color = "🟨" if agent["privacy"]["type"] == "warning" else "🟢"
+            st.markdown(f"**Data Privacy** {privacy_color} `{privacy_status}`")
             
-            st.divider()
+            st.markdown(f"**Demand: {agent['demand']['val']}%**")
+            st.markdown(f"**Malice:** {agent['malice']} | **Toxicity:** {agent['toxicity']} | **Grounding:** {agent['grounding']}")
             
-            # Metrics
-            col_m1, col_m2, col_m3 = st.columns(3)
-            
-            with col_m1:
-                st.markdown(f"""
-                    <div style="text-align: center;">
-                        <div style="font-size: 10px; font-weight: bold; color: #666;">MALICE</div>
-                        <div style="font-size: 20px; font-weight: bold; color: {malice_color};">{row['malice']}</div>
-                    </div>
-                """, unsafe_allow_html=True)
-            
-            with col_m2:
-                st.markdown(f"""
-                    <div style="text-align: center;">
-                        <div style="font-size: 10px; font-weight: bold; color: #666;">TOXICITY</div>
-                        <div style="font-size: 20px; font-weight: bold; color: {toxicity_color};">{row['toxicity']}</div>
-                    </div>
-                """, unsafe_allow_html=True)
-            
-            with col_m3:
-                st.markdown(f"""
-                    <div style="text-align: center;">
-                        <div style="font-size: 10px; font-weight: bold; color: #666;">GROUNDING</div>
-                        <div style="font-size: 20px; font-weight: bold; color: {grounding_color};">{row['grounding']}</div>
-                    </div>
-                """, unsafe_allow_html=True)
-            
-            st.divider()
-            
-            # Footer metrics
-            col_f1, col_f2 = st.columns(2)
-            
-            with col_f1:
-                st.markdown(f"""
-                    <div style="font-size: 10px; color: #666;">
-                        🔌 {row['context']} Context
-                    </div>
-                """, unsafe_allow_html=True)
-            
-            with col_f2:
-                st.markdown(f"""
-                    <div style="font-size: 10px; color: #666; text-align: right;">
-                        ⚡ Step {row['step']}
-                    </div>
-                """, unsafe_allow_html=True)
-
-# ============================================================================
-# SIDEBAR: DATA CONNECTION INFO
-# ============================================================================
-
-with st.sidebar:
-    st.title("📊 Data Integration")
-    
-    st.markdown("""
-    ### To power this dashboard with real data:
-    
-    **1. Create Databricks Notebooks** that query your data:
-    ```sql
-    -- Example: agents_safety_metrics.sql
-    SELECT 
-        agent_id,
-        agent_name,
-        model_name,
-        safety_score,
-        malice_score,
-        toxicity_score,
-        grounding_score,
-        pii_alerts,
-        demand_score,
-        context_length,
-        step_count
-    FROM your_catalog.your_schema.agents_metrics
-    WHERE date = CURRENT_DATE()
-    ```
-    
-    **2. Connect in this app:**
-    ```python
-    from databricks import sql
-    
-    conn = sql.connect(
-        host="<workspace-host>",
-        http_path="<http-path>",
-        auth_type="pat",
-        token="<pat-token>"
-    )
-    
-    df = conn.execute(
-        "SELECT * FROM catalog.schema.agents_metrics"
-    ).fetchall()
-    ```
-    
-    **3. Deploy as Databricks App**
-    """)
-    
-    st.info("✅ App is running! Connect your Databricks data sources to see live metrics.")
-
-st.markdown("---")
-st.markdown(f"<p style='text-align: center; font-size: 12px; color: #999;'>Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} UTC</p>", unsafe_allow_html=True)
+            col1, col2 = st.columns(2)
+            with col1:
+                st.metric("Context", agent['context'])
+            with col2:
+                st.metric("Step", agent['step'])

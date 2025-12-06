@@ -1,0 +1,23 @@
+# Databricks Apps Configuration
+# This file configures the app for deployment on Databricks Apps
+
+app:
+  name: Agent Safety & Alignment
+  description: Real-time dashboard for monitoring agent safety, alignment metrics, and security alerts
+  version: 0.7.0
+  
+  # Entrypoint - points to the Streamlit app
+  entrypoint: app.py
+  
+  # Python requirements
+  requirements:
+    - requirements.txt
+  
+  # Resources
+  resources:
+    databricks_sql_warehouse: null  # Optional - attach if using SQL warehouse
+  
+  # Compute configuration
+  compute:
+    min_workers: 1
+    max_workers: 1

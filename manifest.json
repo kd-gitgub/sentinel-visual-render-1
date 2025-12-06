@@ -1,0 +1,39 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "app_name": "Agent Safety & Alignment",
+    "description": "Real-time dashboard for monitoring agent safety and alignment metrics",
+    "version": "0.7.0",
+    "author": "Databricks",
+    "created_at": "2025-12-06"
+  },
+  "resources": [
+    {
+      "name": "app.py",
+      "type": "streamlit_app",
+      "path": "app.py",
+      "description": "Main Streamlit application"
+    },
+    {
+      "name": "requirements.txt",
+      "type": "requirements",
+      "path": "requirements.txt",
+      "description": "Python package dependencies"
+    },
+    {
+      "name": "databricks.yml",
+      "type": "config",
+      "path": "databricks.yml",
+      "description": "Databricks Apps configuration"
+    }
+  ],
+  "dependencies": {
+    "runtime": "python3.11",
+    "packages": [
+      "streamlit>=1.28.1",
+      "plotly>=5.18.0",
+      "pandas>=2.1.3",
+      "numpy>=1.26.2"
+    ]
+  }
+}
