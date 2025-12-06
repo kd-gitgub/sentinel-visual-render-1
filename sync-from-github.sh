@@ -6,6 +6,10 @@ git pull origin main
 python3 << 'EOF'
 from databricks.sdk import WorkspaceClient
 import pathlib
+import os
+
+os.environ["DATABRICKS_HOST"] = "https://brambles-prod-discovery.cloud.databricks.com"
+os.environ["DATABRICKS_TOKEN"] = "dapi3f5088863b4d2d8f238209636b059867d"
 
 w = WorkspaceClient()
 local_dir = pathlib.Path(".")
