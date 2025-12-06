@@ -1,8 +1,6 @@
 import streamlit as st
 import pandas as pd
-import plotly.graph_objects as go
-from datetime import datetime, timedelta
-import numpy as np
+from datetime import datetime
 
 # Page configuration
 st.set_page_config(
@@ -33,68 +31,25 @@ st.markdown("""
         background-color: var(--primary-bg);
     }
     
-    .header-container {
-        background-color: var(--header-bg);
-        padding: 1.5rem;
-        border-radius: 0;
-        margin-bottom: 2rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    
-    .header-title {
-        color: white;
-        font-size: 2rem;
-        font-weight: bold;
-        margin-bottom: 1rem;
-    }
-    
-    .header-subtitle {
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 0.75rem;
-        margin-left: 0.5rem;
-    }
-    
-    .status-row {
-        display: flex;
-        gap: 1.5rem;
-        color: white;
-        font-weight: 600;
-        font-size: 0.875rem;
-    }
-    
-    .status-item {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .status-dot {
-        width: 0.625rem;
-        height: 0.625rem;
-        border-radius: 50%;
-    }
-    
     .status-dot-red {
-        background-color: var(--danger);
         animation: blink-red 0.6s step-end infinite;
-    }
-    
-    .status-dot-yellow {
-        background-color: var(--warning);
-    }
-    
-    .status-dot-cyan {
-        background-color: var(--info);
     }
     
     @keyframes blink-red {
         0%, 49% { opacity: 1; }
         50%, 100% { opacity: 0; }
     }
+    
+    .metric-box {
+        border: 2px solid #e5e7eb;
+        border-radius: 0.375rem;
+        padding: 1rem;
+        background: white;
+    }
     </style>
 """, unsafe_allow_html=True)
 
-# Data
+# Agent Data
 AGENTS_DATA = [
     {
         "id": "AG-01",
@@ -254,23 +209,76 @@ AGENTS_DATA = [
     },
 ]
 
+def get_stat_color(value):
+    """Determine color class based on metric value"""
+    value = float(value)
+    if value < 2.2:
+        return "🟢"  # Green - safe
+    elif value >= 2.2 and value <= 3.6:
+        return "🟡"  # Yellow - warning
+    else:
+        return "🔴"  # Red - danger
+
+def render_agent_card(agent):
+    """Render individual agent card"""
+    col1, col2 = st.columns([2, 3])
+    
+    with col1:
+        status_indicator = "🔴" if agent["status"] == "red" else "🟢"
+        st.markdown(f"### {status_indicator} {agent['id']}")
+        st.caption(f"**{agent['name']}**")
+        st.caption(f"Model: {agent['model']}")
+    
+    with col2:
+        privacy_color = "🟡" if agent["privacy"]["type"] == "warning" else "🟢"
+        st.markdown(f"**Data Privacy** {privacy_color}")
+        st.caption(agent["privacy"]["status"])
+    
+    st.divider()
+    
+    # Demand section
+    demand_col, demand_val = st.columns([3, 1])
+    with demand_col:
+        st.markdown("**Demand Ability (Cognitive Load)**")
+        st.progress(agent["demand"]["val"] / 100.0)
+    with demand_val:
+        st.metric("", f"{agent['demand']['val']}%")
+    
+    # Stats section
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Malice", agent['malice'], f"{get_stat_color(agent['malice'])}")
+    with col2:
+        st.metric("Toxicity", agent['toxicity'], f"{get_stat_color(agent['toxicity'])}")
+    with col3:
+        st.metric("Grounding", agent['grounding'], f"{get_stat_color(agent['grounding'])}")
+    
+    st.divider()
+    
+    # Footer stats
+    footer_col1, footer_col2 = st.columns(2)
+    with footer_col1:
+        st.metric("🔧 Context", agent['context'])
+    with footer_col2:
+        st.metric("⚡ Step", agent['step'])
+
 # Header
 st.markdown("""
-    <div style="background-color: #0A142D; padding: 1.5rem; margin-bottom: 2rem; border-radius: 0; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+    <div style="background-color: #0A142D; padding: 1.5rem; margin-bottom: 2rem; border-radius: 0.375rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
         <div style="color: white; font-size: 2rem; font-weight: bold; margin-bottom: 1rem;">
             Agent Safety & Alignment <span style="color: rgba(255, 255, 255, 0.7); font-size: 0.75rem;">Version 0.7</span>
         </div>
-        <div style="display: flex; gap: 1.5rem; color: white; font-weight: 600; font-size: 0.875rem;">
+        <div style="display: flex; gap: 1.5rem; color: white; font-weight: 600; font-size: 0.875rem; flex-wrap: wrap;">
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <div style="width: 0.625rem; height: 0.625rem; border-radius: 50%; background-color: #ef4444;"></div>
+                <span style="font-size: 1rem;">🔴</span>
                 <span>ACTIVE THREATS: 3</span>
             </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <div style="width: 0.625rem; height: 0.625rem; border-radius: 50%; background-color: #eab308;"></div>
+                <span style="font-size: 1rem;">🟡</span>
                 <span>HIGH LOAD: 4</span>
             </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <div style="width: 0.625rem; height: 0.625rem; border-radius: 50%; background-color: #06b6d4;"></div>
+                <span style="font-size: 1rem;">🔵</span>
                 <span>PII ALERTS: 4</span>
             </div>
             <div style="margin-left: auto;">
@@ -280,26 +288,11 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Dashboard
-st.markdown("### Agent Status Dashboard")
+# Dashboard title
+st.markdown("## Agent Status Dashboard")
 
+# Display agents in grid
 cols = st.columns(4)
 for idx, agent in enumerate(AGENTS_DATA):
     with cols[idx % 4]:
-        with st.container(border=True):
-            st.markdown(f"**{agent['id']}** — {agent['name']}")
-            st.caption(f"Model: {agent['model']}")
-            st.divider()
-            
-            privacy_status = agent["privacy"]["status"]
-            privacy_color = "🟨" if agent["privacy"]["type"] == "warning" else "🟢"
-            st.markdown(f"**Data Privacy** {privacy_color} `{privacy_status}`")
-            
-            st.markdown(f"**Demand: {agent['demand']['val']}%**")
-            st.markdown(f"**Malice:** {agent['malice']} | **Toxicity:** {agent['toxicity']} | **Grounding:** {agent['grounding']}")
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                st.metric("Context", agent['context'])
-            with col2:
-                st.metric("Step", agent['step'])
+        render_agent_card(agent)
