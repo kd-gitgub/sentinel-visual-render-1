@@ -388,8 +388,10 @@ def render_card(card: dict) -> str:
 
 CUSTOM_CSS = """
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap');
+
 :root {
-    --bg: #f5f6fa;
+    --bg: #ffffff;
     --nav: #0a142d;
     --gray: #e5e7eb;
     --amber: #eab308;
@@ -399,25 +401,37 @@ CUSTOM_CSS = """
     --purple: #d7dde8;
 }
 
+* {
+    font-family: 'Segoe UI', 'Segoe UI Web (West European)', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
+}
+
 body {
     background: var(--bg);
+    margin: 0;
+    padding: 20px;
 }
 
 .main-container {
-    padding: 0 12px 24px;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
 h1.title {
     color: #ffffff;
     margin: 0;
+    font-size: 22px;
+    font-weight: 700;
 }
 
 .header {
     background: var(--nav);
     border-radius: 0;
-    padding: 18px;
-    margin-bottom: 18px;
-    box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+    padding: 24px;
+    margin-bottom: 32px;
+    box-shadow: 0 10px 32px rgba(0,0,0,0.25);
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .banner-row {
@@ -425,7 +439,8 @@ h1.title {
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 24px;
+    margin-top: 16px;
 }
 
 .banner-metric {
@@ -433,21 +448,23 @@ h1.title {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    font-weight: 700;
+    font-weight: 600;
     font-size: 13px;
 }
 
 .badge {
     width: 10px;
     height: 10px;
-    border-radius: 999px;
+    border-radius: 50%;
     display: inline-block;
 }
 
 .card-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
 .card {
@@ -458,37 +475,39 @@ h1.title {
     flex-direction: column;
     height: 100%;
     transition: transform 150ms ease, box-shadow 150ms ease;
+    overflow: hidden;
 }
 
 .card:hover {
-    transform: translateY(-2px);
+    transform: translateY(-4px);
     box-shadow: 0 12px 32px rgba(0,0,0,0.12);
 }
 
 .card-head {
     background: #0a1930;
-    padding: 12px;
+    padding: 10px;
     display: flex;
     justify-content: space-between;
-    gap: 12px;
+    gap: 8px;
+    align-items: flex-start;
 }
 
-.id-block { display: flex; align-items: flex-start; gap: 10px; }
-.name-block { text-align: right; min-width: 0; }
+.id-block { display: flex; align-items: flex-start; gap: 8px; min-width: 0; }
+.name-block { text-align: right; min-width: 0; flex-shrink: 1; }
 .name { color: #ffffff; font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.id-text { color: #ffffff; font-weight: 700; font-size: 14px; }
-.host-text { color: #9ca3af; font-size: 10px; }
-.meta { color: #9ca3af; font-size: 10px; }
+.id-text { color: #ffffff; font-weight: 700; font-size: 13px; }
+.host-text { color: #9ca3af; font-size: 9px; margin-left: 22px; margin-top: 2px; }
+.meta { color: #9ca3af; font-size: 9px; margin-top: 2px; }
 
-.card-body { padding: 14px; display: flex; flex-direction: column; gap: 12px; }
-.section-row { display: flex; align-items: center; gap: 10px; font-size: 12px; text-transform: uppercase; font-weight: 700; }
-.section-label { display: inline-flex; align-items: center; gap: 6px; }
-.privacy { font-weight: 800; }
+.card-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; flex-grow: 1; }
+.section-row { display: flex; align-items: center; gap: 8px; font-size: 12px; text-transform: uppercase; font-weight: 600; text-black; margin-bottom: 4px; }
+.section-label { display: inline-flex; align-items: center; gap: 4px; }
+.privacy { font-weight: 700; }
 
-.section { display: flex; flex-direction: column; gap: 8px; }
-.section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: #111827; }
+.section { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+.section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #000; letter-spacing: 0.5px; }
 
-.bar-row { display: flex; gap: 10px; align-items: center; }
+.bar-row { display: flex; gap: 8px; align-items: center; }
 .demand-bars { display: flex; gap: 2.2px; align-items: flex-end; height: 40px; flex: 1; min-width: 0; overflow: hidden; }
 .demand-bar { width: 6px; height: 40px; flex-shrink: 2; flex-grow: 0; min-width: 2px; max-width: 6px; border-radius: 0; image-rendering: crisp-edges; }
 .bar-red { background: var(--red); }
@@ -499,29 +518,29 @@ h1.title {
 .bar-purple { background: var(--purple); }
 
 .stat { display: flex; flex-direction: column; align-items: flex-start; }
-.stat-value { font-size: 14px; font-weight: 800; line-height: 1; }
+.stat-value { font-size: 14px; font-weight: 700; line-height: 1; }
 .stat-caption { font-size: 10px; font-weight: 700; text-transform: uppercase; margin-top: 2px; }
 
-.triple-row { display: flex; gap: 18px; }
+.triple-row { display: flex; gap: 12px; justify-content: space-around; }
 .triple-item { display: flex; flex-direction: column; align-items: center; flex: 1; }
-.triple-label { font-size: 12px; font-weight: 700; text-transform: uppercase; }
-.triple-value { font-size: 22px; font-weight: 800; margin-top: 4px; }
+.triple-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.triple-value { font-size: 21px; font-weight: 700; margin-top: 4px; }
 
-.card-foot { background: #f9fafb; border-top: 1px solid #f3f4f6; padding: 12px 14px; display: flex; justify-content: space-between; gap: 10px; align-items: center; font-size: 12px; font-weight: 700; }
-.foot-item { display: flex; align-items: center; gap: 8px; }
+.card-foot { background: #f9fafb; border-top: 1px solid #e5e7eb; padding: 10px 12px; display: flex; justify-content: space-between; gap: 8px; align-items: center; font-size: 11px; font-weight: 600; }
+.foot-item { display: flex; align-items: center; gap: 6px; }
 .foot-item.right { justify-content: flex-end; text-align: right; }
-.foot-text { line-height: 1.2; }
-.icon { width: 16px; height: 16px; }
-.icon-privacy { width: 16px; height: 16px; margin-right: 6px; }
+.foot-text { line-height: 1.3; font-size: 10px; }
+.icon { width: 14px; height: 14px; }
+.icon-privacy { width: 14px; height: 14px; margin-right: 4px; }
 
-.dot { width: 14px; height: 14px; border-radius: 999px; margin-top: 2px; }
+.dot { width: 14px; height: 14px; border-radius: 50%; margin-top: 0; flex-shrink: 0; }
 .status-dot-red { background: var(--red); animation: blink-red 0.6s step-end infinite; }
 .status-dot-orange { background: var(--amber); }
 .status-dot-green { background: var(--green); }
 
-.text-black { color: #111827; }
-.text-warning { color: var(--amber); }
-.text-success { color: #66cc00; }
+.text-black { color: #000; }
+.text-warning { color: var(--amber); font-weight: 700; }
+.text-success { color: #66cc00; font-weight: 700; }
 .text-red { color: var(--red); }
 .text-amber { color: var(--amber); }
 .text-green { color: var(--green); }
@@ -561,7 +580,7 @@ grid_html = CUSTOM_CSS + "<div class='card-grid'>" + "".join(
     render_card(card) for card in cards
 ) + "</div>"
 
-st_html(grid_html, height=1200, scrolling=True)
+st_html(grid_html, height=2000, scrolling=True)
 
 # --- Footer note -------------------------------------------------------------
 st.caption(
