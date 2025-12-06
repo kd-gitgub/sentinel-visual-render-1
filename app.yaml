@@ -3,4 +3,4 @@ description: Real-time agent safety monitoring dashboard
 runtime:
   language: PYTHON
   version: "3.11"
-entrypoint: python app.py
+entrypoint: streamlit run app.py --server.port 8000 --server.address 0.0.0.0
