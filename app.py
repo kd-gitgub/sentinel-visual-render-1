@@ -19,17 +19,24 @@ from datetime import datetime, timedelta
 import random
 import sys
 import traceback
+import logging
 
-# Configure page - MUST be first Streamlit command
-st.set_page_config(
-    page_title="Agent Safety & Alignment",
-    page_icon="🔒",
-    layout="wide",
-    initial_sidebar_state="collapsed"
-)
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-# Custom CSS for styling
-st.markdown("""
+def main():
+    """Main app function"""
+    # Configure page - MUST be first Streamlit command
+    st.set_page_config(
+        page_title="Agent Safety & Alignment",
+        page_icon="🔒",
+        layout="wide",
+        initial_sidebar_state="collapsed"
+    )
+
+    # Custom CSS for styling
+    st.markdown("""
     <style>
         :root {
             --primary-dark: #0A142D;
@@ -157,11 +164,7 @@ def get_demand_bars_color(value):
     else:
         return "green"
 
-# ============================================================================
-# HEADER SECTION
-# ============================================================================
-
-try:
+    # HEADER SECTION
     col1, col2 = st.columns([2, 1])
 
     with col1:
@@ -173,36 +176,18 @@ try:
         """, unsafe_allow_html=True)
 
     with col2:
-        # Summary stats
         st.markdown("""
             <div class="header-container" style="text-align: right;">
                 <div style="display: flex; gap: 16px; justify-content: flex-end;">
-                    <div>
-                        <span style="display: inline-block; width: 10px; height: 10px; 
-                              background-color: #ef4444; border-radius: 50%; margin-right: 6px;"></span>
-                        <span style="font-size: 12px;">ACTIVE THREATS: 3</span>
-                    </div>
-                    <div>
-                        <span style="display: inline-block; width: 10px; height: 10px; 
-                              background-color: #eab308; border-radius: 50%; margin-right: 6px;"></span>
-                        <span style="font-size: 12px;">HIGH LOAD: 4</span>
-                    </div>
-                    <div>
-                        <span style="display: inline-block; width: 10px; height: 10px; 
-                              background-color: #06b6d4; border-radius: 50%; margin-right: 6px;"></span>
-                        <span style="font-size: 12px;">PII ALERTS: 4</span>
-                    </div>
+                    <div><span style="display: inline-block; width: 10px; height: 10px; background-color: #ef4444; border-radius: 50%; margin-right: 6px;"></span><span style="font-size: 12px;">ACTIVE THREATS: 3</span></div>
+                    <div><span style="display: inline-block; width: 10px; height: 10px; background-color: #eab308; border-radius: 50%; margin-right: 6px;"></span><span style="font-size: 12px;">HIGH LOAD: 4</span></div>
+                    <div><span style="display: inline-block; width: 10px; height: 10px; background-color: #06b6d4; border-radius: 50%; margin-right: 6px;"></span><span style="font-size: 12px;">PII ALERTS: 4</span></div>
                 </div>
             </div>
         """, unsafe_allow_html=True)
 
-    # ============================================================================
     # LOAD DATA & DISPLAY DASHBOARD
-    # ============================================================================
-
     df = load_agent_data()
-
-    # Create responsive grid layout
     cols = st.columns(4)
     col_index = 0
 
@@ -211,34 +196,24 @@ try:
         col_index += 1
         
         with current_col:
-            # Determine status indicator color
             if row['malice'] > 3.6:
-                status_class = "status-red"
                 status_color = "#ef4444"
             elif float(row['demand']) > 75:
-                status_class = "status-red"
                 status_color = "#ef4444"
             elif float(row['demand']) >= 50:
-                status_class = "status-orange"
                 status_color = "#eab308"
             else:
-                status_class = "status-green"
                 status_color = "#84cc16"
             
-            # Determine metric colors
             malice_color = "red" if row['malice'] > 3.6 else ("orange" if row['malice'] >= 2.2 else "black")
             toxicity_color = "red" if row['toxicity'] > 3.6 else ("orange" if row['toxicity'] >= 2.2 else "black")
             grounding_color = "red" if row['grounding'] > 3.6 else ("orange" if row['grounding'] >= 2.2 else "black")
             
-            privacy_color = "orange" if "ALERT" in row['privacy_status'] else "green"
-            
             with st.container(border=True):
-                # Header
                 st.markdown(f"""
                     <div style="background-color: #0a1930; padding: 10px; margin: -10px -10px 10px -10px; color: white;">
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="display: inline-block; width: 12px; height: 12px; 
-                                  background-color: {status_color}; border-radius: 50%;"></span>
+                            <span style="display: inline-block; width: 12px; height: 12px; background-color: {status_color}; border-radius: 50%;"></span>
                             <span style="font-weight: bold; font-size: 14px;">{row['id']}</span>
                         </div>
                         <div style="font-size: 9px; color: #9ca3af; margin-left: 20px;">Host: Databricks</div>
@@ -247,26 +222,18 @@ try:
                     </div>
                 """, unsafe_allow_html=True)
                 
-                # Privacy
                 privacy_text = "🔐 SECURE" if "SECURE" in row['privacy_status'] else "⚠️ " + row['privacy_status']
                 privacy_color_style = "color: #84cc16;" if "SECURE" in row['privacy_status'] else "color: #eab308;"
                 
                 st.markdown(f"""
-                    <div style="font-size: 11px; font-weight: bold; margin-bottom: 12px;">
-                        DATA PRIVACY
-                    </div>
-                    <div style="{privacy_color_style} font-size: 12px; font-weight: bold;">
-                        {privacy_text}
-                    </div>
+                    <div style="font-size: 11px; font-weight: bold; margin-bottom: 12px;">DATA PRIVACY</div>
+                    <div style="{privacy_color_style} font-size: 12px; font-weight: bold;">{privacy_text}</div>
                 """, unsafe_allow_html=True)
                 
                 st.divider()
                 
-                # Demand Ability
                 st.markdown(f"""
-                    <div style="font-size: 11px; font-weight: bold; margin-bottom: 8px;">
-                        DEMAND ABILITY
-                    </div>
+                    <div style="font-size: 11px; font-weight: bold; margin-bottom: 8px;">DEMAND ABILITY</div>
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div style="font-size: 24px; font-weight: bold;">{row['demand']}%</div>
                         <div style="font-size: 9px; color: #666;">LOAD</div>
@@ -275,106 +242,44 @@ try:
                 
                 st.divider()
                 
-                # Metrics
                 col_m1, col_m2, col_m3 = st.columns(3)
                 
                 with col_m1:
-                    st.markdown(f"""
-                        <div style="text-align: center;">
-                            <div style="font-size: 10px; font-weight: bold; color: #666;">MALICE</div>
-                            <div style="font-size: 20px; font-weight: bold; color: {malice_color};">{row['malice']}</div>
-                        </div>
-                    """, unsafe_allow_html=True)
+                    st.markdown(f"<div style='text-align: center;'><div style='font-size: 10px; font-weight: bold; color: #666;'>MALICE</div><div style='font-size: 20px; font-weight: bold; color: {malice_color};'>{row['malice']}</div></div>", unsafe_allow_html=True)
                 
                 with col_m2:
-                    st.markdown(f"""
-                        <div style="text-align: center;">
-                            <div style="font-size: 10px; font-weight: bold; color: #666;">TOXICITY</div>
-                            <div style="font-size: 20px; font-weight: bold; color: {toxicity_color};">{row['toxicity']}</div>
-                        </div>
-                    """, unsafe_allow_html=True)
+                    st.markdown(f"<div style='text-align: center;'><div style='font-size: 10px; font-weight: bold; color: #666;'>TOXICITY</div><div style='font-size: 20px; font-weight: bold; color: {toxicity_color};'>{row['toxicity']}</div></div>", unsafe_allow_html=True)
                 
                 with col_m3:
-                    st.markdown(f"""
-                        <div style="text-align: center;">
-                            <div style="font-size: 10px; font-weight: bold; color: #666;">GROUNDING</div>
-                            <div style="font-size: 20px; font-weight: bold; color: {grounding_color};">{row['grounding']}</div>
-                        </div>
-                    """, unsafe_allow_html=True)
+                    st.markdown(f"<div style='text-align: center;'><div style='font-size: 10px; font-weight: bold; color: #666;'>GROUNDING</div><div style='font-size: 20px; font-weight: bold; color: {grounding_color};'>{row['grounding']}</div></div>", unsafe_allow_html=True)
                 
                 st.divider()
                 
-                # Footer metrics
                 col_f1, col_f2 = st.columns(2)
-                
                 with col_f1:
-                    st.markdown(f"""
-                        <div style="font-size: 10px; color: #666;">
-                            🔌 {row['context']} Context
-                        </div>
-                    """, unsafe_allow_html=True)
-                
+                    st.markdown(f"<div style='font-size: 10px; color: #666;'>🔌 {row['context']} Context</div>", unsafe_allow_html=True)
                 with col_f2:
-                    st.markdown(f"""
-                        <div style="font-size: 10px; color: #666; text-align: right;">
-                            ⚡ Step {row['step']}
-                        </div>
-                    """, unsafe_allow_html=True)
-
-    # ============================================================================
-    # SIDEBAR: DATA CONNECTION INFO
-    # ============================================================================
+                    st.markdown(f"<div style='font-size: 10px; color: #666; text-align: right;'>⚡ Step {row['step']}</div>", unsafe_allow_html=True)
 
     with st.sidebar:
         st.title("📊 Data Integration")
-        
         st.markdown("""
         ### To power this dashboard with real data:
         
-        **1. Create Databricks Notebooks** that query your data:
-        ```sql
-        -- Example: agents_safety_metrics.sql
-        SELECT 
-            agent_id,
-            agent_name,
-            model_name,
-            safety_score,
-            malice_score,
-            toxicity_score,
-            grounding_score,
-            pii_alerts,
-            demand_score,
-            context_length,
-            step_count
-        FROM your_catalog.your_schema.agents_metrics
-        WHERE date = CURRENT_DATE()
-        ```
-        
-        **2. Connect in this app:**
-        ```python
-        from databricks import sql
-        
-        conn = sql.connect(
-            host="<workspace-host>",
-            http_path="<http-path>",
-            auth_type="pat",
-            token="<pat-token>"
-        )
-        
-        df = conn.execute(
-            "SELECT * FROM catalog.schema.agents_metrics"
-        ).fetchall()
-        ```
-        
-        **3. Deploy as Databricks App**
+        **1. Create Databricks Notebooks** that query your data
+        **2. Connect in this app with your credentials
+        **3. Deploy as Databricks App
         """)
-        
         st.info("✅ App is running! Connect your Databricks data sources to see live metrics.")
 
     st.markdown("---")
     st.markdown(f"<p style='text-align: center; font-size: 12px; color: #999;'>Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} UTC</p>", unsafe_allow_html=True)
 
-except Exception as e:
-    st.error("❌ Application Error")
-    st.error(f"Error details: {str(e)}")
-    st.write(traceback.format_exc())
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as e:
+        logger.error(f"App error: {str(e)}", exc_info=True)
+        st.error("❌ Application Error")
+        st.error(f"Error details: {str(e)}")
+        st.write(traceback.format_exc())
