@@ -1,11 +1,11 @@
 import math
-import sys
 import streamlit as st
 
 st.set_page_config(
     page_title="Agent Safety & Alignment",
     layout="wide",
     page_icon="🛡️",
+    initial_sidebar_state="collapsed",
 )
 
 # --- Data --------------------------------------------------------------------
@@ -560,13 +560,3 @@ st.markdown("</div>", unsafe_allow_html=True)
 st.caption(
     "Databricks Streamlit App • Static sample data. Replace with Unity Catalog queries or API calls for live telemetry."
 )
-
-
-# When the Databricks App runner invokes "python app.py" instead of
-# "streamlit run app.py", bootstrap the Streamlit CLI manually so the
-# ScriptRunContext is created.
-if __name__ == "__main__":
-    from streamlit.web import cli as stcli
-
-    sys.argv = ["streamlit", "run", __file__, "--server.headless=true", "--server.port=8501"]
-    sys.exit(stcli.main())
