@@ -1,7 +1,7 @@
 import math
 import streamlit as st
 
-st.set_page_config(page_title="Sentinel Safety", layout="wide")
+st.set_page_config(page_title="Agent Safety & Alignment", layout="wide", page_icon="🛡️")
 
 # --- Data --------------------------------------------------------------------
 cards = [
