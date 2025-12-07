@@ -392,12 +392,12 @@ CUSTOM_CSS = """
 
 :root {
     --bg: #ffffff;
-    --nav: #0a142d;
+    --nav: #0079FF;
     --gray: #e5e7eb;
     --amber: #eab308;
     --green: #84cc16;
     --red: #ef4444;
-    --dark: #0a142d;
+    --dark: #0079FF;
     --purple: #d7dde8;
 }
 
@@ -484,7 +484,7 @@ h1.title {
 }
 
 .card-head {
-    background: #0a1930;
+    background: #0079FF;
     padding: 10px;
     display: flex;
     justify-content: space-between;
