@@ -429,9 +429,7 @@ h1.title {
     padding: 24px;
     margin-bottom: 32px;
     box-shadow: 0 10px 32px rgba(0,0,0,0.25);
-    max-width: 1400px;
-    margin-left: auto;
-    margin-right: auto;
+    max-width: 100%;
 }
 
 .banner-row {
@@ -463,10 +461,8 @@ h1.title {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 24px;
-    max-width: 1400px;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 0 20px;
+    max-width: 100%;
+    padding: 0 24px 32px 24px;
 }
 
 .card {
