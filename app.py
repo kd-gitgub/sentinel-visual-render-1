@@ -562,6 +562,7 @@ st.markdown("")  # Empty spacer
 
 # --- Grid --------------------------------------------------------------------
 grid_html = CUSTOM_CSS + """
+<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==" type="image/png">
 <div class='main-wrapper'>
     <div class='header'>
         <h1 class='title'>Agent Safety & Alignment <span style='font-size:12px;opacity:0.7;'>Version 0.7</span></h1>
