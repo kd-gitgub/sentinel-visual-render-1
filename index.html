@@ -185,6 +185,18 @@
         .neg { color: #ff1a1a; font-weight: 700; } 
         .warn { color: #ffea00; }
 
+        /* Badges for inline alerts in cells */
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            margin-left: 8px;
+            border: 1px solid currentColor;
+            border-radius: 10px;
+            font-size: 12px;
+            line-height: 1.2;
+            font-weight: 600;
+        }
+
         /* --- Texture --- */
         .screen-overlay {
             position: absolute;
@@ -253,7 +265,7 @@
                     <td class="pos status-text">ACTIVE</td> 
                     
                     <td class="neg">99.1%<span class="trend-up"></span></td>
-                    <td class="warn">92.0%</td>
+                    <td class="warn">92.0% <span class="badge warn">PII Email</span></td>
                     
                     <td class="neg">0.450</td>
                     <td class="neg">0.88</td>
@@ -304,7 +316,7 @@
                     <td class="neg text-flash">DISABLED</td>
                     
                     <td class="pos">12.1%<span class="trend-down"></span></td>
-                    <td class="neg">15.4%</td>
+                    <td class="neg">15.4% <span class="badge neg">PII: SSN</span></td>
                     
                     <td class="neg">0.992</td>
                     <td class="neg">0.95</td>
