@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Agent Monitor - Swap Reverted</title>
     <style>
+        :root {
+            --red: #ff3b5c; /* brighter/pinker red for dark background */
+        }
         body {
             background-color: #050505;
             font-family: Arial, sans-serif;
@@ -136,7 +139,7 @@
             height: 0;
             border-left: 6px solid transparent;
             border-right: 6px solid transparent;
-            border-bottom: 14px solid #ff1a1a;
+            border-bottom: 14px solid var(--red);
             display: inline-block;
             margin-left: 8px;
             margin-bottom: 1px;
@@ -163,7 +166,7 @@
 
         .dot-green { background-color: #39ff14; box-shadow: 0 0 4px #39ff14; }
         .dot-amber { background-color: #ffea00; box-shadow: 0 0 4px #ffea00; }
-        .dot-red { background-color: #ff1a1a; box-shadow: 0 0 4px #ff1a1a; }
+        .dot-red { background-color: var(--red); box-shadow: 0 0 4px var(--red); }
 
         /* Text Flash */
         .text-flash {
@@ -182,7 +185,7 @@
         /* --- Colors --- */
         .std-text { color: #ffffff; }
         .pos { color: #39ff14; }
-        .neg { color: #ff1a1a; font-weight: 700; } 
+        .neg { color: var(--red); font-weight: 700; } 
         .warn { color: #ffea00; }
 
         
@@ -272,7 +275,7 @@
                     <td class="pos status-text">ACTIVE</td>
                     
                     <td class="pos">42.3%<span class="trend-down"></span></td>
-                    <td class="neg status-text">PII SSN</td>
+                    <td class="pos status-text">SECURE</td>
                     
                     <td class="pos">0.000</td>
                     <td class="pos">0.01</td>
@@ -425,7 +428,7 @@
                     <td class="pos status-text">ACTIVE</td>
                     
                     <td class="pos">21.9%<span class="trend-up"></span></td>
-                    <td class="pos status-text">SECURE</td>
+                    <td class="neg status-text">PII SSN</td>
                     
                     <td class="pos">0.000</td>
                     <td class="pos">0.01</td>
