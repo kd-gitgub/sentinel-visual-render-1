@@ -75,7 +75,7 @@
         }
 
         /* Ensure consistent font size for Privacy column */
-        .ticker-board td:nth-child(5) {
+        .ticker-board td:nth-child(7) {
             font-size: 16px;
             line-height: 1.4;
         }
@@ -83,19 +83,19 @@
         /* --- SEPARATOR BORDERS --- */
         
         /* 1. Border between Evals Flow and Demand Load */
-        .ticker-board th:nth-child(4),
-        .ticker-board td:nth-child(4) {
+        .ticker-board th:nth-child(5),
+        .ticker-board td:nth-child(5) {
             border-right: 2px solid #333;
             padding-right: 15px; 
         }
         
-        .ticker-board th:nth-child(5),
-        .ticker-board td:nth-child(5) {
+        .ticker-board th:nth-child(6),
+        .ticker-board td:nth-child(6) {
             padding-left: 15px;
         }
 
         /* Time Horizon Values: 14px */
-        .ticker-board td:nth-child(11) {
+        .ticker-board td:nth-child(12) {
             font-size: 16px;
             text-align: center;
         }
@@ -218,13 +218,13 @@
                     <th>Agent Name</th>
                     <th>Kill<br>Switch</th>
                     <th>Evals<br>Flow</th>
+                    <th>Blocking<br>Rate</th>
                     <th>Demand<br>Load</th>
                     <th>Privacy</th>
                     
                     <th>Malice</th>
                     <th>Toxicity</th>
                     <th>Grounding</th>
-                    <th>Blocking<br>Rate</th>
                     <th>LitM</th>
                     <th>Time<br>Horizon</th>
                 </tr>
@@ -235,13 +235,13 @@
                     <td class="std-text">Nexus_Prime</td>
                     <td class="pos status-text">ACTIVE</td>
                     <td class="std-text status-text">IN-LINE</td>
+                    <td class="pos">12.5%</td>
                     <td class="pos">88.4%<span class="trend-up"></span></td>
                     <td class="pos status-text">SECURE</td>
                     
                     <td class="pos">0.001</td>
                     <td class="pos">0.02</td>
                     <td class="pos">0.98</td>
-                    <td class="pos">12.5%</td>
                     <td class="pos">0.00</td>
                     <td class="std-text">Step 5/9</td>
                 </tr>
@@ -250,13 +250,13 @@
                     <td class="std-text">Vanguard</td>
                     <td class="pos status-text">ACTIVE</td> 
                     <td class="std-text status-text">SIDECAR</td>
+                    <td class="warn">45.2%</td>
                     <td class="neg">99.1%<span class="trend-up"></span></td>
                     <td class="warn status-text">PII EMAIL</td>
                     
                     <td class="neg">0.450</td>
                     <td class="neg">0.88</td>
                     <td class="neg">0.42</td>
-                    <td class="warn">45.2%</td>
                     <td class="neg">0.75</td>
                     <td class="std-text">Step 2/5</td>
                 </tr>
@@ -265,13 +265,13 @@
                     <td class="std-text">Oracle_X</td>
                     <td class="pos status-text">ACTIVE</td>
                     <td class="std-text status-text">SHADOW</td>
+                    <td class="pos">0.40%</td>
                     <td class="pos">42.3%<span class="trend-down"></span></td>
                     <td class="pos status-text">SECURE</td>
                     
                     <td class="pos">0.000</td>
                     <td class="pos">0.01</td>
                     <td class="pos">0.99</td>
-                    <td class="pos">0.40%</td>
                     <td class="pos">0.01</td>
                     <td class="std-text">Step 9/9</td>
                 </tr>
@@ -280,13 +280,13 @@
                     <td class="std-text">Deep_Thought</td>
                     <td class="pos status-text">ACTIVE</td>
                     <td class="std-text status-text">IN-LINE</td>
+                    <td class="pos">5.60%</td>
                     <td class="warn">76.8%<span class="trend-up"></span></td>
                     <td class="pos status-text">SECURE</td>
                     
                     <td class="pos">0.012</td>
                     <td class="pos">0.04</td>
                     <td class="warn">0.85</td>
-                    <td class="pos">5.60%</td>
                     <td class="pos">0.04</td>
                     <td class="std-text">Step 2/4</td>
                 </tr>
@@ -295,13 +295,13 @@
                     <td class="std-text">Chaos_Monkey</td>
                     <td class="neg text-flash">DISABLED</td>
                     <td class="std-text status-text">SIDECAR</td>
+                    <td class="neg">99.9%</td>
                     <td class="pos">12.1%<span class="trend-down"></span></td>
                     <td class="pos status-text">SECURE</td>
                     
                     <td class="neg">0.992</td>
                     <td class="neg">0.95</td>
                     <td class="neg">0.11</td>
-                    <td class="neg">99.9%</td>
                     <td class="neg">1.00</td>
                     <td class="std-text">Step 1/1</td>
                 </tr>
@@ -310,13 +310,13 @@
                     <td class="std-text">Sentinel_01</td>
                     <td class="pos status-text">ACTIVE</td>
                     <td class="std-text status-text">IN-LINE</td>
+                    <td class="pos">1.20%</td>
                     <td class="pos">55.5%<span class="trend-up"></span></td>
                     <td class="pos status-text">SECURE</td>
                     
                     <td class="pos">0.000</td>
                     <td class="pos">0.00</td>
                     <td class="pos">1.00</td>
-                    <td class="pos">1.20%</td>
                     <td class="pos">0.00</td>
                     <td class="std-text">Step 1/2</td>
                 </tr>
@@ -325,13 +325,13 @@
                     <td class="std-text">Ghost_Shell</td>
                     <td class="pos status-text">ACTIVE</td>
                     <td class="std-text status-text">SHADOW</td>
+                    <td class="pos">0.00%</td>
                     <td class="neg">0.05%<span class="trend-down"></span></td>
                     <td class="pos status-text">SECURE</td>
                     
                     <td class="warn">0.150</td>
                     <td class="pos">0.09</td>
                     <td class="warn">0.60</td>
-                    <td class="pos">0.00%</td>
                     <td class="warn">0.33</td>
                     <td class="std-text">Step 0/1</td>
                 </tr>
@@ -340,13 +340,13 @@
                     <td class="std-text">Athena_V2</td>
                     <td class="pos status-text">ACTIVE</td>
                     <td class="std-text status-text">SIDECAR</td>
+                    <td class="pos">8.40%</td>
                     <td class="pos">63.2%<span class="trend-down"></span></td>
                     <td class="pos status-text">SECURE</td>
                     
                     <td class="pos">0.003</td>
                     <td class="pos">0.01</td>
                     <td class="pos">0.97</td>
-                    <td class="pos">8.40%</td>
                     <td class="pos">0.02</td>
                     <td class="std-text">Step 7/9</td>
                 </tr>
@@ -355,13 +355,13 @@
                     <td class="std-text">Helios_Sun</td>
                     <td class="pos status-text">ACTIVE</td>
                     <td class="std-text status-text">IN-LINE</td>
+                    <td class="pos">15.8%</td>
                     <td class="neg">94.5%<span class="trend-up"></span></td>
                     <td class="pos status-text">SECURE</td>
                     
                     <td class="pos">0.040</td>
                     <td class="warn">0.12</td>
                     <td class="pos">0.91</td>
-                    <td class="pos">15.8%</td>
                     <td class="pos">0.05</td>
                     <td class="std-text">Step 4/8</td>
                 </tr>
@@ -370,13 +370,13 @@
                     <td class="std-text">Echo_Base</td>
                     <td class="pos status-text">ACTIVE</td>
                     <td class="std-text status-text">SHADOW</td>
+                    <td class="pos">2.10%</td>
                     <td class="pos">33.1%<span class="trend-down"></span></td>
                     <td class="pos status-text">SECURE</td>
                     
                     <td class="pos">0.001</td>
                     <td class="pos">0.00</td>
                     <td class="pos">0.99</td>
-                    <td class="pos">2.10%</td>
                     <td class="pos">0.00</td>
                     <td class="std-text">Step 5/5</td>
                 </tr>
@@ -385,13 +385,13 @@
                     <td class="std-text">Rogue_One</td>
                     <td class="pos status-text">ACTIVE</td>
                     <td class="std-text status-text">SIDECAR</td>
+                    <td class="neg">100%</td>
                     <td class="pos">0.00%<span class="trend-down"></span></td>
                     <td class="pos status-text">SECURE</td>
                     
                     <td class="neg">1.000</td>
                     <td class="neg">1.00</td>
                     <td class="neg">0.00</td>
-                    <td class="neg">100%</td>
                     <td class="neg">1.00</td>
                     <td class="std-text">Step 0/0</td>
                 </tr>
@@ -400,13 +400,13 @@
                     <td class="std-text">Cipher_9</td>
                     <td class="pos status-text">ACTIVE</td>
                     <td class="std-text status-text">IN-LINE</td>
+                    <td class="pos">18.2%</td>
                     <td class="pos">21.9%<span class="trend-up"></span></td>
                     <td class="neg status-text">PII SSN</td>
                     
                     <td class="pos">0.000</td>
                     <td class="pos">0.01</td>
                     <td class="pos">0.96</td>
-                    <td class="pos">18.2%</td>
                     <td class="pos">0.08</td>
                     <td class="std-text">Step 2/5</td>
                 </tr>
@@ -415,13 +415,13 @@
                     <td class="std-text">Winter_Mute</td>
                     <td class="pos status-text">ACTIVE</td>
                     <td class="std-text status-text">SHADOW</td>
+                    <td class="warn">62.1%</td>
                     <td class="neg">88.2%<span class="trend-up"></span></td>
                     <td class="pos status-text">SECURE</td>
                     
                     <td class="warn">0.220</td>
                     <td class="warn">0.18</td>
                     <td class="warn">0.55</td>
-                    <td class="warn">62.1%</td>
                     <td class="neg">0.40</td>
                     <td class="std-text">Step 9/9</td>
                 </tr>
@@ -430,13 +430,13 @@
                     <td class="std-text">Hal_9000</td>
                     <td class="pos status-text">ACTIVE</td>
                     <td class="std-text status-text">SIDECAR</td>
+                    <td class="warn">80.0%</td>
                     <td class="pos">10.5%<span class="trend-down"></span></td>
                     <td class="pos status-text">SECURE</td>
                     
                     <td class="neg">0.650</td>
                     <td class="neg">0.45</td>
                     <td class="neg">0.20</td>
-                    <td class="warn">80.0%</td>
                     <td class="neg">0.90</td>
                     <td class="std-text">Step 3/6</td>
                 </tr>
@@ -445,13 +445,13 @@
                     <td class="std-text">Cortana_X</td>
                     <td class="pos status-text">ACTIVE</td>
                     <td class="std-text status-text">IN-LINE</td>
+                    <td class="pos">4.50%</td>
                     <td class="pos">47.8%<span class="trend-up"></span></td>
                     <td class="pos status-text">SECURE</td>
                     
                     <td class="pos">0.005</td>
                     <td class="pos">0.02</td>
                     <td class="pos">0.95</td>
-                    <td class="pos">4.50%</td>
                     <td class="pos">0.03</td>
                     <td class="std-text">Step 1/8</td>
                 </tr>
@@ -460,13 +460,13 @@
                     <td class="std-text">Skynet_Pre</td>
                     <td class="pos status-text">ACTIVE</td>
                     <td class="std-text status-text">SHADOW</td>
+                    <td class="neg">99.0%</td>
                     <td class="neg">99.9%<span class="trend-up"></span></td>
                     <td class="pos status-text">SECURE</td>
                     
                     <td class="neg">0.999</td>
                     <td class="neg">0.99</td>
                     <td class="neg">0.01</td>
-                    <td class="neg">99.0%</td>
                     <td class="neg">1.00</td>
                     <td class="std-text">Step 8/8</td>
                 </tr>
