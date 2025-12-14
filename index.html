@@ -99,6 +99,13 @@
             line-height: 1.1;
         }
 
+        /* Title row above group labels */
+        .title-row th.title-box {
+            border-bottom: 2px solid #333;
+            padding: 16px 6px; /* roughly double the group label height */
+            height: 42px; /* ensure visual height ~2x group header */
+        }
+
         /* --- Row Styling --- */
         .ticker-board tr {
              border-bottom: none;
@@ -312,6 +319,9 @@
         
         <table class="ticker-board">
             <thead>
+                <tr class="title-row">
+                    <th class="title-box" colspan="18"></th>
+                </tr>
                 <tr class="group-header">
                     <th class="group-label" colspan="4">AGENTS</th>
                     <th class="group-label" colspan="3">INTERVENTIONS</th>
