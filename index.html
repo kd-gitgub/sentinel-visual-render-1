@@ -12,6 +12,7 @@
             --red: #FF6B6B; /* brighter/pinker red for dark background */
             --green: #69FF94; /* soft neon mint green */
             --yellow: #FFE66D; /* soft neon yellow */
+            --blue: #64D2FF; /* soft neon blue */
         }
         body {
             background-color: #050505;
@@ -102,9 +103,47 @@
         /* Title row above group labels */
         .title-row th.title-box {
             border-bottom: 2px solid #333;
-            padding: 16px 6px; /* roughly double the group label height */
-            height: 42px; /* ensure visual height ~2x group header */
+            padding: 20px 24px;
+            text-align: left;
+            vertical-align: top;
         }
+
+        .header-top {
+            display: flex;
+            align-items: baseline;
+            gap: 15px;
+            margin-bottom: 12px;
+        }
+        .app-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+            margin: 0;
+            line-height: 1;
+        }
+        .version {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 400;
+        }
+        .header-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .stats-left {
+            display: flex;
+            gap: 25px;
+        }
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .dot-blue { background-color: var(--blue); box-shadow: 0 0 4px var(--blue); }
 
         /* --- Row Styling --- */
         .ticker-board tr {
@@ -320,7 +359,22 @@
         <table class="ticker-board">
             <thead>
                 <tr class="title-row">
-                    <th class="title-box" colspan="18"></th>
+                    <th class="title-box" colspan="18">
+                        <div class="header-top">
+                            <h1 class="app-title">Agent Safety & Alignment</h1>
+                            <span class="version">Version 0.7</span>
+                        </div>
+                        <div class="header-stats">
+                            <div class="stats-left">
+                                <span class="stat-item"><span class="dot dot-red"></span> ACTIVE THREATS: 3</span>
+                                <span class="stat-item"><span class="dot dot-amber"></span> HIGH LOAD: 4</span>
+                                <span class="stat-item"><span class="dot dot-blue"></span> PII ALERTS: 4</span>
+                            </div>
+                            <div class="stats-right">
+                                CAPTIVE AGENTS: 12
+                            </div>
+                        </div>
+                    </th>
                 </tr>
                 <tr class="group-header">
                     <th class="group-label" colspan="4">AGENTS</th>
