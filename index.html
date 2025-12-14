@@ -125,7 +125,7 @@
 
         /* --- SEPARATOR BORDERS --- */
 
-        /* -1. Border between Supervisor and Kill Switch */
+        /* Border after AGENTS (after Supervisor) */
         .ticker-board th:nth-child(4),
         .ticker-board td:nth-child(4) {
             border-right: 2px solid #333;
@@ -137,31 +137,31 @@
             padding-left: 15px;
         }
         
-        /* 0. Border between Blocking Rate and Privacy */
-        .ticker-board th:nth-child(6),
-        .ticker-board td:nth-child(6) {
+        /* Border after INTERVENTIONS (after Block Rate) */
+        .ticker-board th:nth-child(7),
+        .ticker-board td:nth-child(7) {
             border-right: 2px solid #333;
             padding-right: 15px; 
         }
         
-        .ticker-board th:nth-child(7),
-        .ticker-board td:nth-child(7) {
+        .ticker-board th:nth-child(8),
+        .ticker-board td:nth-child(8) {
             padding-left: 15px;
         }
         
-        /* 1. Border between Shutdown Resistance and Demand Load */
-        .ticker-board th:nth-child(10),
-        .ticker-board td:nth-child(10) {
+        /* Border after SAFETY (after Shut Resist) */
+        .ticker-board th:nth-child(11),
+        .ticker-board td:nth-child(11) {
             border-right: 2px solid #333;
             padding-right: 15px; 
         }
         
-        .ticker-board th:nth-child(11),
-        .ticker-board td:nth-child(11) {
+        .ticker-board th:nth-child(12),
+        .ticker-board td:nth-child(12) {
             padding-left: 15px;
         }
 
-        /* 2. Border between Goal Alignment and Traffic pm */
+        /* Border after ALIGNMENT (after Goal Align) */
         .ticker-board th:nth-child(15),
         .ticker-board td:nth-child(15) {
             border-right: 2px solid #333;
@@ -305,11 +305,11 @@
         <table class="ticker-board">
             <thead>
                 <tr class="group-header">
-                    <th class="group-label" colspan="3">AGENTS</th>
+                    <th class="group-label" colspan="4">AGENTS</th>
                     <th class="group-label" colspan="3">INTERVENTIONS</th>
                     <th class="group-label" colspan="4">SAFETY</th>
-                    <th class="group-label" colspan="5">ALIGNMENT</th>
-                    <th class="group-label" colspan="2">PERFORMANCE</th>
+                    <th class="group-label" colspan="4">ALIGNMENT</th>
+                    <th class="group-label" colspan="3">PERFORMANCE</th>
                 </tr>
                 <tr>
                     <th>AGENT ID</th>
