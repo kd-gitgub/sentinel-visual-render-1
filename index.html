@@ -161,7 +161,7 @@
         .mode-control {
             display: flex;
             flex-direction: column;
-            align-items: flex-end; /* Aligns label text to the right */
+            align-items: center; /* Changed from flex-end to center */
             gap: 2px;
         }
 
@@ -171,7 +171,7 @@
             color: rgba(255, 255, 255, 0.4);
             letter-spacing: 1px;
             text-transform: uppercase;
-            margin-right: 2px;
+            margin-right: 0; /* Removed margin */
         }
 
         .toggle-wrapper {
@@ -221,7 +221,7 @@
             background-color: #fff;
             border-radius: 9999px; /* Fully rounded */
             transition: transform 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            /* Box-shadow property removed */
         }
 
         /* Checked State (Move thumb to right) */
