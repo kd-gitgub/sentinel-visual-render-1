@@ -10,6 +10,8 @@
     <style>
         :root {
             --red: #FF6B6B; /* brighter/pinker red for dark background */
+            --green: #69FF94; /* soft neon mint green */
+            --yellow: #FFE66D; /* soft neon yellow */
         }
         body {
             background-color: #050505;
@@ -230,7 +232,7 @@
             height: 0;
             border-left: 7px solid transparent;
             border-right: 7px solid transparent;
-            border-top: 12px solid #69FF94;
+            border-top: 12px solid var(--green);
             display: inline-block;
             margin: 0;
             vertical-align: middle;
@@ -252,8 +254,8 @@
             100% { opacity: 0; }
         }
 
-        .dot-green { background-color: #69FF94; box-shadow: 0 0 4px #69FF94; }
-        .dot-amber { background-color: #ffea00; box-shadow: 0 0 4px #ffea00; }
+        .dot-green { background-color: var(--green); box-shadow: 0 0 4px var(--green); }
+        .dot-amber { background-color: var(--yellow); box-shadow: 0 0 4px var(--yellow); }
         .dot-red { background-color: var(--red); box-shadow: 0 0 4px var(--red); }
 
         /* Text Flash */
@@ -272,9 +274,9 @@
 
         /* --- Colors --- */
         .std-text { color: rgba(255, 255, 255, 0.8); }
-        .pos { color: #69FF94; }
+        .pos { color: var(--green); }
         .neg { color: var(--red); font-weight: 700; } 
-        .warn { color: #ffea00; }
+        .warn { color: var(--yellow); }
 
         
 
