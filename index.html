@@ -148,6 +148,83 @@
         }
         .dot-blue { background-color: var(--blue); box-shadow: 0 0 4px var(--blue); }
 
+        /* Update the Right Stats Container to hold multiple items */
+        .stats-right {
+            display: flex;
+            align-items: center;
+            gap: 30px; /* Space between Captive Agents and the Switch */
+        }
+
+        /* Mode Control Container */
+        .mode-control {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .mode-title {
+            font-size: 10px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 1px;
+            line-height: 1;
+        }
+
+        .toggle-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toggle-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.4);
+            transition: color 0.3s;
+        }
+
+        .toggle-label.active {
+            color: #fff;
+            font-weight: 700;
+        }
+
+        /* Shadcn-style Animated Switch */
+        .shadcn-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background-color: #333;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border: 1px solid #444;
+        }
+
+        .shadcn-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            position: absolute;
+        }
+
+        .shadcn-switch .thumb {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 18px;
+            height: 18px;
+            background-color: #fff;
+            border-radius: 50%;
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Checked State (Move thumb to right) */
+        .shadcn-switch input:checked + .thumb {
+            transform: translateX(20px);
+        }
+
         /* --- Row Styling --- */
         .ticker-board tr {
              border-bottom: none;
@@ -374,7 +451,19 @@
                                 <span class="stat-item"><span class="dot dot-blue"></span> PII ALERTS: 4</span>
                             </div>
                             <div class="stats-right">
-                                CAPTIVE AGENTS: 12
+                                <span>CAPTIVE AGENTS: 12</span>
+                                
+                                <div class="mode-control">
+                                    <span class="mode-title">MODE</span>
+                                    <div class="toggle-wrapper">
+                                        <span class="toggle-label active">LIVE</span>
+                                        <label class="shadcn-switch">
+                                            <input type="checkbox">
+                                            <span class="thumb"></span>
+                                        </label>
+                                        <span class="toggle-label">README</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </th>
