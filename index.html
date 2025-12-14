@@ -176,7 +176,7 @@
         }
 
         /* --- ALIGNMENT & SPACING ADJUSTMENTS --- */
-        .ticker-board th:nth-child(1),
+        .ticker-board th:not(.group-header) > th:nth-child(1),
         .ticker-board td:nth-child(1) {
             width: 90px;
             max-width: 90px;
@@ -184,7 +184,7 @@
             padding-right: 20px;
         }
         
-        .ticker-board th:nth-child(2),
+        .ticker-board tr:not(.group-header) th:nth-child(2),
         .ticker-board td:nth-child(2) {
             text-align: left;
             padding-left: 0px;
