@@ -43,11 +43,21 @@
             table-layout: auto; 
         }
 
+        /* --- Group Labels --- */
+        .group-label {
+            text-align: center;
+            padding: 6px 6px 2px 6px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 700;
+            font-size: 12px;
+            border-bottom: 2px solid #333;
+        }
+
         /* --- Header Styling --- */
         .ticker-board th {
             text-align: center;
             padding: 8px 6px;
-            color: rgba(255, 255, 255, 1);
+            color: #ffffff;
             font-weight: 400;
             font-size: 13px;
             border-bottom: 2px solid #333;
@@ -260,6 +270,13 @@
         
         <table class="ticker-board">
             <thead>
+                <tr class="group-header">
+                    <th class="group-label" colspan="3">AGENTS</th>
+                    <th class="group-label" colspan="3">INTERVENTIONS</th>
+                    <th class="group-label" colspan="4">SAFETY</th>
+                    <th class="group-label" colspan="4">ALIGNMENT</th>
+                    <th class="group-label" colspan="2">PERFORMANCE</th>
+                </tr>
                 <tr>
                     <th>AGENT ID</th>
                     <th>AGENT NAME</th>
