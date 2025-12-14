@@ -151,8 +151,9 @@
         /* Update the Right Stats Container to hold multiple items */
         .stats-right {
             display: flex;
-            align-items: center;
-            gap: 30px; /* Space between Captive Agents and the Switch */
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
         }
 
         /* Mode Control Container */
@@ -451,8 +452,6 @@
                                 <span class="stat-item"><span class="dot dot-blue"></span> PII ALERTS: 4</span>
                             </div>
                             <div class="stats-right">
-                                <span>CAPTIVE AGENTS: 12</span>
-                                
                                 <div class="mode-control">
                                     <span class="mode-title">MODE</span>
                                     <div class="toggle-wrapper">
@@ -464,6 +463,8 @@
                                         <span class="toggle-label">README</span>
                                     </div>
                                 </div>
+                                
+                                <span>CAPTIVE AGENTS: 12</span>
                             </div>
                         </div>
                     </th>
