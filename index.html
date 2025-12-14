@@ -108,11 +108,20 @@
             vertical-align: top;
         }
 
+        /* Layout for top row */
         .header-top {
+            display: flex;
+            justify-content: space-between; /* Pushes Title Left, Switch Right */
+            align-items: center;            /* Vertically centers them */
+            margin-bottom: 12px;
+            width: 100%;
+        }
+
+        /* Grouping for Title & Version */
+        .header-branding {
             display: flex;
             align-items: baseline;
             gap: 15px;
-            margin-bottom: 12px;
         }
         .app-title {
             font-size: 24px;
@@ -148,34 +157,27 @@
         }
         .dot-blue { background-color: var(--blue); box-shadow: 0 0 4px var(--blue); }
 
-        /* Update the Right Stats Container to hold multiple items */
-        .stats-right {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 8px;
-        }
-
-        /* Mode Control Container */
+        /* Streamlined Switch Styling */
         .mode-control {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 4px;
+            align-items: flex-end; /* Aligns label text to the right */
+            gap: 2px;
         }
 
         .mode-title {
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 700;
-            color: rgba(255, 255, 255, 0.5);
+            color: rgba(255, 255, 255, 0.4);
             letter-spacing: 1px;
-            line-height: 1;
+            text-transform: uppercase;
+            margin-right: 2px;
         }
 
         .toggle-wrapper {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .toggle-label {
@@ -190,16 +192,16 @@
             font-weight: 700;
         }
 
-        /* Shadcn-style Animated Switch */
+        /* Switch Track - Cleaner, borderless */
         .shadcn-switch {
             position: relative;
-            width: 44px;
-            height: 24px;
-            background-color: #333;
+            width: 40px;
+            height: 20px;
+            background-color: #27272a; /* Zinc-800 for deep matte look */
             border-radius: 9999px;
             cursor: pointer;
-            transition: background-color 0.3s;
-            border: 1px solid #444;
+            transition: background-color 0.2s;
+            /* Removed border to fix 'brick-work' effect */
         }
 
         .shadcn-switch input {
@@ -209,16 +211,17 @@
             position: absolute;
         }
 
+        /* Switch Thumb - Simple white rounded rect */
         .shadcn-switch .thumb {
             position: absolute;
             top: 2px;
             left: 2px;
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             background-color: #fff;
-            border-radius: 50%;
-            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            border-radius: 9999px; /* Fully rounded */
+            transition: transform 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
 
         /* Checked State (Move thumb to right) */
@@ -442,9 +445,24 @@
                 <tr class="title-row">
                     <th class="title-box" colspan="18">
                         <div class="header-top">
-                            <h1 class="app-title">AGENT EVALS</h1>
-                            <span class="version">Argus version 0.7</span>
+                            <div class="header-branding">
+                                <h1 class="app-title">AGENT EVALS</h1>
+                                <span class="version">Argus version 0.7</span>
+                            </div>
+
+                            <div class="mode-control">
+                                <span class="mode-title">MODE</span>
+                                <div class="toggle-wrapper">
+                                    <span class="toggle-label active">LIVE</span>
+                                    <label class="shadcn-switch">
+                                        <input type="checkbox"> 
+                                        <span class="thumb"></span>
+                                    </label>
+                                    <span class="toggle-label">README</span>
+                                </div>
+                            </div>
                         </div>
+
                         <div class="header-stats">
                             <div class="stats-left">
                                 <span class="stat-item"><span class="dot dot-red"></span> ACTIVE THREATS: 3</span>
@@ -452,19 +470,7 @@
                                 <span class="stat-item"><span class="dot dot-blue"></span> PII ALERTS: 4</span>
                             </div>
                             <div class="stats-right">
-                                <div class="mode-control">
-                                    <span class="mode-title">MODE</span>
-                                    <div class="toggle-wrapper">
-                                        <span class="toggle-label active">LIVE</span>
-                                        <label class="shadcn-switch">
-                                            <input type="checkbox">
-                                            <span class="thumb"></span>
-                                        </label>
-                                        <span class="toggle-label">README</span>
-                                    </div>
-                                </div>
-                                
-                                <span>CAPTIVE AGENTS: 12</span>
+                                CAPTIVE AGENTS: 12
                             </div>
                         </div>
                     </th>
